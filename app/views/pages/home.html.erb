@@ -1,0 +1,85 @@
+<% content_for :title, "Publish Your Story" %>
+<% content_for :meta_description, "MyBlog — a modern blog platform with built-in SEO scoring, smart scheduling, and analytics. Read, write, and grow your audience." %>
+
+<!-- Hero -->
+<section class="hero">
+  <!-- Animated background blur orbs -->
+  <div class="hero-orbs" aria-hidden="true">
+    <div class="orb orb-1 animate-pulse"></div>
+    <div class="orb orb-2 animate-pulse delay-1s"></div>
+    <div class="orb orb-3 animate-pulse delay-2s"></div>
+  </div>
+
+  <div class="hero-inner">
+    <div class="hero-eyebrow">
+      <span class="hero-dot"></span>
+      A modern blog platform
+    </div>
+
+    <h1 class="hero-title">
+      Write. Publish.<br>
+      <span class="gradient-text">Grow.</span>
+    </h1>
+
+    <p class="hero-deck">
+      MyBlog is a fast, accessible publishing tool with built-in SEO scoring,
+      smart scheduling, social integrations, and a clean reading experience for your audience.
+    </p>
+
+    <div class="hero-actions">
+      <% if user_signed_in? %>
+        <%= link_to "Go to dashboard", dashboard_path, class: "btn btn-primary text-base", style: "padding: 0.75rem 1.5rem;" %>
+        <%= link_to "New post", new_blog_path, class: "btn btn-secondary text-base", style: "padding: 0.75rem 1.5rem;" %>
+      <% else %>
+        <%= link_to "Read the blog →", blog_archive_path, class: "btn btn-primary text-base", style: "padding: 0.75rem 1.5rem;" %>
+        <%= link_to "Sign in", new_user_session_path, class: "btn btn-secondary text-base", style: "padding: 0.75rem 1.5rem;" %>
+      <% end %>
+    </div>
+
+    <!-- Feature highlights -->
+    <div class="hero-features">
+      <% [
+        { icon: "📊", title: "SEO Scoring",   desc: "Real-time scores as you write" },
+        { icon: "🚀", title: "Smart Schedule",desc: "Auto-publish at the best time" },
+        { icon: "🔗", title: "Social Ready",  desc: "Connect every channel" },
+        { icon: "🔔", title: "Webhooks",      desc: "Pipe events anywhere" }
+      ].each do |feat| %>
+        <div class="hero-feature glass">
+          <div class="text-2xl mb-3"><%= feat[:icon] %></div>
+          <h3 class="feature-title"><%= feat[:title] %></h3>
+          <p class="feature-desc"><%= feat[:desc] %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<!-- Recent posts -->
+<% if @recent_blogs.any? %>
+  <section class="home-section" aria-label="Recent blog posts">
+    <div class="home-section-inner">
+      <div class="home-section-header">
+        <div>
+          <h2 class="home-section-title">Latest from the blog</h2>
+          <p class="home-section-subtitle">Stories, tutorials, and ideas worth your time.</p>
+        </div>
+        <%= link_to "View all posts →", blog_archive_path,
+              class: "text-sm font-medium", style: "color: var(--color-accent);" %>
+      </div>
+
+      <% if @topics.any? %>
+        <nav class="reading-topics home-topics" aria-label="Browse topics">
+          <% @topics.first(6).each do |topic| %>
+            <%= link_to topic.name, topic_path(topic), class: "topic-pill" %>
+          <% end %>
+        </nav>
+      <% end %>
+
+      <div class="home-grid">
+        <% @recent_blogs.each do |blog| %>
+          <%= render "blogs/card", blog: blog %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+<% end %>

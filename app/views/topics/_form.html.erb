@@ -1,0 +1,85 @@
+<% content_for :title, @topic.new_record? ? "New Topic" : "Edit Topic" %>
+
+<div class="page-header">
+  <h1 class="page-title"><%= @topic.new_record? ? "New Topic" : "Edit: #{@topic.name}" %></h1>
+</div>
+
+<div class="page-content max-w-2xl">
+  <%= form_with model: @topic, html: { class: "space-y-5" } do |f| %>
+    <div class="card p-6 space-y-5">
+
+      <% if @topic.errors.any? %>
+        <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
+          <ul class="text-red-400 text-sm space-y-1 list-disc list-inside">
+            <% @topic.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="form-group">
+        <%= f.label :name, class: "form-label" %>
+        <%= f.text_field :name, class: "form-input", placeholder: "e.g. Technology",
+            maxlength: 80, required: true %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :slug, class: "form-label" %>
+        <%= f.text_field :slug, class: "form-input font-mono", placeholder: "e.g. technology",
+            pattern: "[a-z0-9-]+", title: "Lowercase letters, numbers, and hyphens only" %>
+        <p class="form-hint">Auto-generated from name if left blank</p>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :description, class: "form-label" %>
+        <%= f.text_area :description, class: "form-input", rows: 3,
+            placeholder: "Brief description of this topic…" %>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="form-group">
+          <%= f.label :color_hex, "Accent Color", class: "form-label" %>
+          <div class="flex items-center gap-3">
+            <%= f.color_field :color_hex, class: "w-10 h-10 rounded-lg border border-gray-700 bg-transparent cursor-pointer", id: "color_hex_picker" %>
+            <%= f.text_field :color_hex, class: "form-input font-mono", placeholder: "#6366f1",
+                pattern: "#[0-9A-Fa-f]{6}", maxlength: 7, id: "color_hex_text" %>
+          </div>
+          <script>
+            document.getElementById('color_hex_picker').addEventListener('input', function() {
+              document.getElementById('color_hex_text').value = this.value;
+            });
+            document.getElementById('color_hex_text').addEventListener('input', function() {
+              if (this.value.match(/^#[0-9A-Fa-f]{6}$/)) {
+                document.getElementById('color_hex_picker').value = this.value;
+              }
+            });
+          </script>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :icon_name, "Icon Name", class: "form-label" %>
+          <%= f.text_field :icon_name, class: "form-input", placeholder: "e.g. cpu, palette" %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :parent_id, "Parent Topic", class: "form-label" %>
+        <%= f.collection_select :parent_id, @parent_topics, :id, :name,
+            { include_blank: "None (root level)" }, class: "form-input" %>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <%= f.check_box :is_active, id: "topic_is_active",
+            class: "rounded border-gray-600 bg-gray-800 text-violet-600 focus:ring-violet-500" %>
+        <%= f.label :is_active, "Active (visible to users)", class: "text-sm text-gray-300" %>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <%= f.submit @topic.new_record? ? "Create Topic" : "Update Topic",
+          class: "btn-primary" %>
+      <%= link_to "Cancel", topics_path, class: "btn-secondary" %>
+    </div>
+  <% end %>
+</div>

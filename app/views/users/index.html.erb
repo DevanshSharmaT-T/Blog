@@ -1,0 +1,123 @@
+<% content_for :title, "Users" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Users</h1>
+    <p class="page-subtitle"><%= pluralize(@pagy.count, "user") %> total</p>
+  </div>
+</div>
+
+<div class="page-content">
+  <%= search_form_for @q, url: users_path, html: { class: "mb-5" } do |s| %>
+    <div class="flex items-center gap-3">
+      <%= s.search_field :name_or_email_cont,
+            class: "form-input flex-1",
+            placeholder: "Search by name or email…",
+            "aria-label": "Search users" %>
+      <%= s.select :role_eq,
+            options_for_select(
+              [["All roles", ""], ["Owner", "owner"], ["Admin", "admin"], ["User", "user"], ["Visitor", "visitor"]],
+              params.dig(:q, :role_eq)
+            ),
+            {}, class: "form-input w-40" %>
+      <%= s.submit "Filter", class: "btn-secondary" %>
+    </div>
+  <% end %>
+
+  <div class="card overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-900/50 text-xs uppercase text-gray-500 tracking-wider">
+        <tr>
+          <th class="text-left px-4 py-3">User</th>
+          <th class="text-left px-4 py-3">Role</th>
+          <th class="text-left px-4 py-3">Status</th>
+          <th class="text-left px-4 py-3">Last Login</th>
+          <th class="text-left px-4 py-3">Joined</th>
+          <th class="text-right px-4 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-800">
+        <% @users.each do |user| %>
+          <tr class="hover:bg-gray-900/40 transition-colors">
+            <td class="px-4 py-3">
+              <%= link_to user_path(user), class: "flex items-center gap-3 group" do %>
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-indigo-500 flex items-center justify-center text-white text-xs font-semibold shrink-0 overflow-hidden">
+                  <% if user.avatar_url.present? %>
+                    <img src="<%= user.avatar_url %>" alt="" class="w-full h-full object-cover">
+                  <% else %>
+                    <%= user.name.to_s[0].to_s.upcase %>
+                  <% end %>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-white group-hover:text-violet-400 transition-colors"><%= user.name %></p>
+                  <p class="text-xs text-gray-500"><%= user.email %></p>
+                </div>
+              <% end %>
+            </td>
+            <td class="px-4 py-3">
+              <% color = { "owner" => "violet", "admin" => "amber", "user" => "emerald", "visitor" => "gray" }[user.role] %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-<%= color %>-500/10 text-<%= color %>-400 capitalize">
+                <%= user.role %>
+              </span>
+            </td>
+            <td class="px-4 py-3">
+              <% if user.is_active %>
+                <span class="text-emerald-400 text-xs">● Active</span>
+              <% else %>
+                <span class="text-gray-500 text-xs">● Inactive</span>
+              <% end %>
+            </td>
+            <td class="px-4 py-3 text-xs text-gray-400">
+              <%= user.last_login_at ? time_ago_in_words(user.last_login_at) + " ago" : "—" %>
+            </td>
+            <td class="px-4 py-3 text-xs text-gray-400">
+              <%= user.created_at.strftime("%b %d, %Y") %>
+            </td>
+            <td class="px-4 py-3 text-right">
+              <div class="inline-flex items-center gap-2">
+                <% if can?(:change_role, user) && user != current_user %>
+                  <%= form_with url: change_role_user_path(user), method: :patch, local: true, class: "inline" do |fr| %>
+                    <%= fr.select :role,
+                          options_for_select(
+                            (current_user.owner_role? ? [["Owner", "owner"]] : []) +
+                            [["Admin", "admin"], ["User", "user"], ["Visitor", "visitor"]],
+                            user.role
+                          ),
+                          {}, class: "form-input text-xs py-1 w-24",
+                              "data-action": "change->this.form.requestSubmit" %>
+                  <% end %>
+                <% end %>
+
+                <% if can?(:toggle_active, user) && user != current_user %>
+                  <%= button_to toggle_active_user_path(user), method: :patch,
+                        class: "btn-secondary text-xs py-1 px-2",
+                        title: (user.is_active ? "Deactivate" : "Activate") do %>
+                    <%= user.is_active ? "Deactivate" : "Activate" %>
+                  <% end %>
+                <% end %>
+
+                <% if can?(:destroy, user) && user != current_user %>
+                  <%= button_to user_path(user), method: :delete,
+                        data: { turbo_confirm: "Soft-delete this user? They will be unable to sign in." },
+                        class: "btn-secondary text-xs py-1 px-2 text-red-400 hover:text-red-300" do %>
+                    Delete
+                  <% end %>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <% if @users.empty? %>
+      <div class="p-10 text-center text-gray-500 text-sm">No users match your filters.</div>
+    <% end %>
+  </div>
+
+  <% if @pagy.pages > 1 %>
+    <div class="mt-5">
+      <%== pagy_nav(@pagy) %>
+    </div>
+  <% end %>
+</div>

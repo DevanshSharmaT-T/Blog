@@ -1,0 +1,85 @@
+<% content_for :title, @webhook.new_record? ? "New Webhook" : "Edit Webhook" %>
+
+<div class="page-header">
+  <h1 class="page-title"><%= @webhook.new_record? ? "Create Webhook" : "Edit Webhook" %></h1>
+</div>
+
+<div class="page-content max-w-2xl">
+  <%= form_with model: [:settings, @webhook], html: { class: "space-y-5" } do |f| %>
+    <div class="card p-6 space-y-5">
+
+      <% if @webhook.errors.any? %>
+        <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
+          <ul class="text-red-400 text-sm space-y-1 list-disc list-inside">
+            <% @webhook.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="form-group">
+        <%= f.label :name, class: "form-label" %>
+        <%= f.text_field :name, class: "form-input", placeholder: "e.g. Slack Notifications",
+            required: true %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :target_url, "Endpoint URL", class: "form-label" %>
+        <%= f.url_field :target_url, class: "form-input font-mono text-sm",
+            placeholder: "https://hooks.example.com/...", required: true %>
+        <p class="form-hint">POST requests will be sent here with HMAC-SHA256 signature</p>
+      </div>
+
+      <!-- Event subscriptions -->
+      <div>
+        <p class="form-label">Events</p>
+        <p class="form-hint mb-3">Select events that should trigger this webhook</p>
+        <div class="grid grid-cols-2 gap-2">
+          <% [
+            ["blog.published", "Blog published"],
+            ["blog.updated",   "Blog updated"],
+            ["blog.deleted",   "Blog deleted"],
+            ["blog.archived",  "Blog archived"],
+            ["blog.scheduled", "Blog scheduled"],
+            ["analytics.synced", "Analytics synced"]
+          ].each do |event_key, event_label| %>
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-gray-700 cursor-pointer
+                          hover:border-gray-600 has-[:checked]:border-violet-500/50 has-[:checked]:bg-violet-500/5 transition-all">
+              <input type="checkbox" name="api_webhook[events][]" value="<%= event_key %>"
+                     id="event_<%= event_key.gsub('.', '_') %>"
+                     <%= @webhook.events&.include?(event_key) ? 'checked' : '' %>
+                     class="rounded border-gray-600 bg-gray-800 text-violet-600 focus:ring-violet-500">
+              <div>
+                <p class="text-sm font-medium text-gray-200"><%= event_label %></p>
+                <p class="text-xs text-gray-500 font-mono"><%= event_key %></p>
+              </div>
+            </label>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <%= f.check_box :is_active, id: "webhook_is_active",
+            class: "rounded border-gray-600 bg-gray-800 text-violet-600 focus:ring-violet-500" %>
+        <%= f.label :is_active, "Active", class: "text-sm text-gray-300" %>
+      </div>
+
+      <% unless @webhook.new_record? %>
+        <div class="bg-gray-800/50 rounded-xl p-4">
+          <p class="text-xs text-gray-500 mb-1">HMAC Secret — used to verify webhook signatures</p>
+          <p class="text-xs text-gray-600 font-mono">
+            <%# Never display the secret — it's encrypted. Show instructions instead. %>
+            Your secret was generated when this webhook was created. It cannot be displayed again.
+            Delete and recreate to rotate it.
+          </p>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <%= f.submit @webhook.new_record? ? "Create Webhook" : "Save Changes", class: "btn-primary" %>
+      <%= link_to "Cancel", settings_webhooks_path, class: "btn-secondary" %>
+    </div>
+  <% end %>
+</div>

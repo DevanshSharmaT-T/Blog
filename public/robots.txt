@@ -1,1 +1,14 @@
-# See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+# MyBlog robots policy
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /users/sign_in
+Disallow: /users/sign_up
+Disallow: /users/password
+Disallow: /users/confirmation
+Disallow: /api/
+Disallow: /uploads
+Crawl-delay: 1
+
+Sitemap: /sitemap.xml

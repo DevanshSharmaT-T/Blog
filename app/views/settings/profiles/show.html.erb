@@ -1,0 +1,97 @@
+<% content_for :title, "Profile Settings" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Profile</h1>
+    <p class="page-subtitle">Manage your personal information and account details.</p>
+  </div>
+</div>
+
+<div class="page-content max-w-3xl">
+  <%= form_with model: @user, url: settings_profile_path, method: :patch, html: { class: "space-y-5" } do |f| %>
+
+    <% if @user.errors.any? %>
+      <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-4" role="alert">
+        <p class="text-red-400 font-medium text-sm mb-2">Please fix the following errors:</p>
+        <ul class="list-disc list-inside text-red-300 text-sm space-y-1">
+          <% @user.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <!-- Avatar -->
+    <div class="card p-6" data-controller="cover-preview image-upload">
+      <p class="form-label">Avatar</p>
+      <div class="flex items-start gap-5 mt-2">
+        <div class="w-20 h-20 rounded-full bg-gradient-to-br from-violet-400 to-indigo-500 flex items-center justify-center text-white text-2xl font-semibold shrink-0 overflow-hidden">
+          <% if @user.avatar_url.present? %>
+            <img data-cover-preview-target="image" data-image-upload-target="image" src="<%= @user.avatar_url %>" alt="Avatar" class="w-full h-full object-cover">
+          <% else %>
+            <span><%= @user.name.to_s[0].to_s.upcase %></span>
+          <% end %>
+        </div>
+        <div class="flex-1">
+          <div data-image-upload-target="dropzone"
+               class="border-2 border-dashed border-gray-700 rounded-xl p-4 text-center cursor-pointer hover:border-gray-600 transition-colors"
+               data-action="click->image-upload#pickFile">
+            <p class="text-sm text-gray-400">Drag &amp; drop an avatar, or <span class="text-violet-400 underline">browse</span></p>
+            <p class="text-xs text-gray-500 mt-1">Square images work best · up to 10 MB</p>
+            <input type="file" accept="image/*" class="hidden"
+                   data-image-upload-target="fileInput"
+                   data-action="change->image-upload#fileChosen">
+          </div>
+          <div data-image-upload-target="spinner" class="hidden text-sm text-violet-400 mt-2">Uploading…</div>
+          <div data-image-upload-target="error"   class="hidden text-sm text-red-400 mt-2"></div>
+          <%= f.url_field :avatar_url,
+                class: "form-input mt-3",
+                placeholder: "Or paste a URL",
+                data: { cover_preview_target: "input", image_upload_target: "urlField", action: "input->cover-preview#input" } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile fields -->
+    <div class="card p-6 space-y-4">
+      <div class="form-group">
+        <%= f.label :name, class: "form-label" %>
+        <%= f.text_field :name, class: "form-input", required: true, maxlength: 120 %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :bio, class: "form-label" %>
+        <%= f.text_area :bio, class: "form-input", rows: 3, placeholder: "A short bio shown on your blog posts." %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :website_url, "Website URL", class: "form-label" %>
+        <%= f.url_field :website_url, class: "form-input", placeholder: "https://…" %>
+      </div>
+    </div>
+
+    <!-- Email & password -->
+    <div class="card p-6 space-y-4">
+      <h3 class="text-sm font-semibold text-white">Email</h3>
+      <p class="text-xs text-gray-500">Changing your email requires your current password and triggers a re-confirmation.</p>
+
+      <div class="form-group">
+        <%= f.label :email, class: "form-label" %>
+        <%= f.email_field :email, class: "form-input", value: @user.email %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :current_password, "Current password (required when changing email)", class: "form-label" %>
+        <%= f.password_field :current_password, class: "form-input", autocomplete: "current-password" %>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between">
+      <p class="text-xs text-gray-500">
+        Role: <span class="text-gray-300 capitalize"><%= @user.role %></span> ·
+        Joined <%= @user.created_at.strftime("%b %d, %Y") %>
+      </p>
+      <%= f.submit "Save Profile", class: "btn-primary" %>
+    </div>
+  <% end %>
+</div>

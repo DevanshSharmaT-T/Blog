@@ -1,0 +1,72 @@
+<% content_for :title, @integration.new_record? ? "New Integration" : "Edit Integration" %>
+
+<div class="page-header">
+  <h1 class="page-title"><%= @integration.new_record? ? "Add Integration" : "Edit Integration" %></h1>
+</div>
+
+<div class="page-content max-w-2xl">
+  <%= form_with model: [:settings, @integration], html: { class: "space-y-5" } do |f| %>
+    <div class="card p-6 space-y-5">
+
+      <% if @integration.errors.any? %>
+        <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
+          <ul class="text-red-400 text-sm space-y-1 list-disc list-inside">
+            <% @integration.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="form-group">
+        <%= f.label :provider_type, "Type", class: "form-label" %>
+        <%= f.select :provider_type,
+            [%w[Analytics analytics], %w[Email email], %w[SEO seo], %w[AI ai],
+             %w[Storage storage], %w[Social social], %w[Notification notification], %w[Custom custom]],
+            {}, class: "form-input" %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :provider, "Provider", class: "form-label" %>
+        <%= f.text_field :provider, class: "form-input", placeholder: "e.g. google_analytics, mailchimp",
+            required: true %>
+        <p class="form-hint">Lowercase identifier for this service</p>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :label, "Display Name", class: "form-label" %>
+        <%= f.text_field :label, class: "form-input", placeholder: "e.g. Google Analytics" %>
+      </div>
+
+      <!-- Encrypted Credentials -->
+      <div class="form-group">
+        <p class="form-label">Credentials <span class="text-gray-600 font-normal">(encrypted at rest)</span></p>
+        <div class="space-y-3 mt-2" id="credentials-fields">
+          <% [["API Key / Client ID", "api_key"], ["API Secret / Client Secret", "api_secret"],
+              ["Access Token", "access_token"], ["Webhook Secret", "webhook_secret"]].each do |label, key| %>
+            <div class="flex gap-2">
+              <input type="text" class="form-input w-32 text-xs" value="<%= key %>" placeholder="key"
+                     name="credentials[<%= key %>][key]" aria-label="<%= label %> key">
+              <input type="password" class="form-input flex-1" placeholder="<%= label %>"
+                     name="credentials[<%= key %>][value]" autocomplete="new-password"
+                     aria-label="<%= label %> value">
+            </div>
+          <% end %>
+        </div>
+        <p class="form-hint mt-2">Leave blank to keep existing credentials.</p>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :status, class: "form-label" %>
+        <%= f.select :status,
+            [%w[Active active], %w[Inactive inactive]],
+            {}, class: "form-input" %>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <%= f.submit @integration.new_record? ? "Add Integration" : "Save Changes", class: "btn-primary" %>
+      <%= link_to "Cancel", settings_integrations_path, class: "btn-secondary" %>
+    </div>
+  <% end %>
+</div>

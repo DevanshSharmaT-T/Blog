@@ -1,29 +1,66 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" class="h-full" data-theme="<%= current_theme %>">
   <head>
-    <title><%= content_for(:title) || "My Blog" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="My Blog">
-    <meta name="mobile-web-app-capable" content="yes">
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
+    <!-- No-FOUC theme bootstrap: must run before paint. -->
+    <script>
+      (function() {
+        try {
+          var stored = localStorage.getItem('theme');
+          var cookie = document.cookie.match(/(?:^|; )theme=([^;]*)/);
+          var t = stored || (cookie && decodeURIComponent(cookie[1])) || 'light';
+          document.documentElement.setAttribute('data-theme', t);
+        } catch (_) {}
+      })();
+    </script>
 
-    <%= yield :head %>
+    <%= render "shared/seo_head" %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
-
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <!-- Chartkick -->
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <%= javascript_include_tag "chartkick", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <%= yield %>
+  <body class="h-full font-inter antialiased app-shell">
+    <!-- Flash messages -->
+    <% if notice.present? %>
+      <div id="flash-notice" class="fixed top-4 right-4 z-50 flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-5 py-3 rounded-xl shadow-lg backdrop-blur-sm animate-slide-in" role="alert" aria-live="polite" data-controller="flash" data-flash-delay-value="4000">
+        <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+        <span class="text-sm font-medium"><%= notice %></span>
+        <button type="button" class="ml-2 text-emerald-300 hover:text-emerald-200" data-action="flash#close" aria-label="Dismiss">×</button>
+      </div>
+    <% end %>
+    <% if alert.present? %>
+      <div id="flash-alert" class="fixed top-4 right-4 z-50 flex items-center gap-3 bg-red-500/10 border border-red-500/30 text-red-400 px-5 py-3 rounded-xl shadow-lg backdrop-blur-sm animate-slide-in" role="alert" aria-live="assertive" data-controller="flash" data-flash-delay-value="4000">
+        <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+        <span class="text-sm font-medium"><%= alert %></span>
+        <button type="button" class="ml-2 text-red-300 hover:text-red-200" data-action="flash#close" aria-label="Dismiss">×</button>
+      </div>
+    <% end %>
+
+    <!-- App shell: public header for guests/reader pages; sidebar for authenticated dashboard. -->
+    <% show_sidebar = user_signed_in? && !devise_controller? && !public_page? %>
+    <div class="<%= show_sidebar ? 'flex h-full' : 'flex flex-col min-h-screen' %>">
+      <% if show_sidebar %>
+        <%= render "shared/sidebar" %>
+        <main id="main-content" class="ml-64 flex-1 min-h-screen overflow-y-auto">
+          <%= yield %>
+        </main>
+      <% else %>
+        <% unless devise_controller? %>
+          <%= render "shared/public_header" %>
+        <% end %>
+        <main id="main-content" class="flex-1">
+          <%= yield %>
+        </main>
+      <% end %>
+    </div>
   </body>
 </html>

@@ -1,0 +1,21 @@
+<%# Locals: user (required) %>
+<aside class="author-card" itemscope itemtype="https://schema.org/Person">
+  <div class="author-card-avatar">
+    <% if user.avatar_url.present? %>
+      <img src="<%= user.avatar_url %>" alt="<%= user.name %>" itemprop="image">
+    <% else %>
+      <span><%= user.name.to_s[0].to_s.upcase %></span>
+    <% end %>
+  </div>
+  <div class="author-card-body">
+    <h3 itemprop="name">Written by <%= user.name %></h3>
+    <% if user.bio.present? %>
+      <p itemprop="description"><%= user.bio %></p>
+    <% else %>
+      <p>Writer on MyBlog.</p>
+    <% end %>
+    <% if user.website_url.present? %>
+      <%= link_to "Visit website →", user.website_url, target: "_blank", rel: "noopener author", itemprop: "url" %>
+    <% end %>
+  </div>
+</aside>

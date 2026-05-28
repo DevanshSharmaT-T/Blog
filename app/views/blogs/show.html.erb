@@ -1,0 +1,75 @@
+<% content_for :title, (@blog.seo_title.presence || @blog.title) %>
+<% content_for :meta_description, (@blog.seo_description.presence || @blog.excerpt.to_s.truncate(160)) %>
+
+<article class="reading-article"
+         itemscope itemtype="https://schema.org/BlogPosting">
+
+  <!-- Reading progress bar (scroll-linked) -->
+  <div class="reading-progress-bar" data-controller="reading-progress" aria-hidden="true"></div>
+
+  <% if @blog.cover_image_url.present? %>
+    <figure class="reading-cover">
+      <img src="<%= @blog.cover_image_url %>"
+           alt="<%= @blog.title %>"
+           loading="eager"
+           fetchpriority="high"
+           itemprop="image">
+    </figure>
+  <% end %>
+
+  <header class="reading-container reading-header">
+    <nav class="reading-topics" aria-label="Topics">
+      <% @blog.topics.each do |topic| %>
+        <%= link_to topic.name, topic_path(topic), class: "topic-pill", rel: "category tag" %>
+      <% end %>
+    </nav>
+
+    <h1 class="reading-title" itemprop="headline"><%= @blog.title %></h1>
+
+    <% if @blog.excerpt.present? %>
+      <p class="reading-deck" itemprop="description"><%= @blog.excerpt %></p>
+    <% end %>
+
+    <address class="reading-byline" itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <%= render "shared/avatar", user: @blog.author %>
+      <span>
+        By
+        <a href="<%= user_path(@blog.author) rescue '#' %>" rel="author" itemprop="url">
+          <span itemprop="name"><%= @blog.author.name %></span>
+        </a>
+        <span class="sep">·</span>
+        <time datetime="<%= @blog.published_at&.iso8601 %>" itemprop="datePublished">
+          <%= @blog.published_at&.strftime("%B %-d, %Y") %>
+        </time>
+        <span class="sep">·</span>
+        <meta itemprop="timeRequired" content="PT<%= @blog.reading_time_mins %>M">
+        <span><%= @blog.reading_time_mins %> min read</span>
+        <% if @blog.word_count.to_i > 0 %>
+          <meta itemprop="wordCount" content="<%= @blog.word_count %>">
+        <% end %>
+      </span>
+    </address>
+
+    <%= render "blogs/share_buttons", blog: @blog %>
+  </header>
+
+  <div class="reading-container">
+    <div class="prose-blog" itemprop="articleBody">
+      <%= render_blog_content(@blog) %>
+    </div>
+  </div>
+
+  <%= render "shared/author_card", user: @blog.author %>
+
+  <% if @related_blogs.any? %>
+    <section class="reading-container reading-related" aria-label="Related posts">
+      <h2>Continue reading</h2>
+      <div class="related-grid">
+        <% @related_blogs.each do |related| %>
+          <%= render "blogs/card", blog: related %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+</article>

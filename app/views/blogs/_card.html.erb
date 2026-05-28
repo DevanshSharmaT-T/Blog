@@ -1,0 +1,41 @@
+<%# Locals: blog (required) %>
+<article class="blog-card" itemscope itemtype="https://schema.org/BlogPosting">
+  <% if blog.cover_image_url.present? %>
+    <%= link_to public_blog_path(slug: blog.slug), class: "blog-card-cover", "aria-label": blog.title do %>
+      <img src="<%= blog.cover_image_url %>"
+           alt="<%= blog.title %>"
+           loading="lazy"
+           itemprop="image">
+    <% end %>
+  <% end %>
+
+  <div class="blog-card-body">
+    <div class="blog-card-meta">
+      <% blog.topics.first(2).each do |topic| %>
+        <%= link_to topic.name, topic_path(topic), class: "topic-pill", rel: "category tag" %>
+      <% end %>
+    </div>
+
+    <h3 class="blog-card-title">
+      <%= link_to blog.title, public_blog_path(slug: blog.slug), itemprop: "headline url" %>
+    </h3>
+
+    <% if blog.excerpt.present? %>
+      <p class="blog-card-excerpt" itemprop="description"><%= blog.excerpt %></p>
+    <% end %>
+
+    <div class="blog-card-footer">
+      <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+        <span itemprop="name"><%= blog.author.name %></span>
+      </span>
+      <span>
+        <time datetime="<%= blog.published_at&.iso8601 %>" itemprop="datePublished">
+          <%= blog.published_at&.strftime("%b %-d, %Y") %>
+        </time>
+        <% if blog.reading_time_mins.to_i > 0 %>
+          · <%= blog.reading_time_mins %> min
+        <% end %>
+      </span>
+    </div>
+  </div>
+</article>

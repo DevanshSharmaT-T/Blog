@@ -1,0 +1,14 @@
+<%# Locals: user (required), size: optional "sm|md|lg" %>
+<% size_class = case local_assigns[:size]
+                when "sm" then "w-8 h-8 text-xs"
+                when "lg" then "w-16 h-16 text-2xl"
+                else "w-10 h-10 text-sm"
+                end %>
+<span class="<%= size_class %> rounded-full overflow-hidden inline-flex items-center justify-center font-semibold text-white"
+      style="background: linear-gradient(135deg, var(--color-brand-400), var(--color-brand-700));">
+  <% if user.avatar_url.present? %>
+    <img src="<%= user.avatar_url %>" alt="<%= user.name %>" class="w-full h-full object-cover">
+  <% else %>
+    <%= user.name.to_s[0].to_s.upcase %>
+  <% end %>
+</span>

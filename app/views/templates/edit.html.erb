@@ -1,0 +1,17 @@
+<% content_for :title, "Edit: #{@template.name}" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Edit Template</h1>
+    <p class="page-subtitle"><%= @template.name %></p>
+  </div>
+  <%= button_to template_path(@template), method: :delete,
+        data: { turbo_confirm: "Archive this template? It will be hidden from writers." },
+        class: "btn-secondary text-red-400 hover:text-red-300" do %>
+    Archive
+  <% end %>
+</div>
+
+<div class="page-content max-w-3xl">
+  <%= render "form" %>
+</div>

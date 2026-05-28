@@ -1,0 +1,67 @@
+<% content_for :title, "Webhooks" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Webhooks</h1>
+    <p class="page-subtitle">Send real-time event notifications to external services</p>
+  </div>
+  <%= link_to new_settings_webhook_path, class: "btn-primary" do %>
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+    New Webhook
+  <% end %>
+</div>
+
+<div class="page-content space-y-4">
+  <% if @webhooks.any? %>
+    <% @webhooks.each do |webhook| %>
+      <div class="card p-5">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-3 mb-1">
+              <h3 class="text-base font-semibold text-white"><%= webhook.name %></h3>
+              <% if webhook.is_active %>
+                <span class="badge badge-active">Active</span>
+              <% else %>
+                <span class="badge badge-inactive">Disabled</span>
+              <% end %>
+            </div>
+            <p class="text-sm text-gray-400 font-mono truncate mb-2"><%= webhook.target_url %></p>
+            <div class="flex flex-wrap gap-1.5">
+              <% webhook.events.each do |event| %>
+                <span class="badge badge-scheduled text-xs"><%= event %></span>
+              <% end %>
+            </div>
+            <div class="flex items-center gap-4 mt-3 text-xs text-gray-500">
+              <% if webhook.last_triggered_at %>
+                <span>Last triggered <%= time_ago_in_words(webhook.last_triggered_at) %> ago</span>
+              <% end %>
+              <% if webhook.failure_count > 0 %>
+                <span class="text-red-400"><%= webhook.failure_count %> failure(s)</span>
+              <% end %>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <%= link_to delivery_log_settings_webhook_path(webhook), class: "btn-secondary btn-sm" do %>
+              View Log
+            <% end %>
+            <%= link_to edit_settings_webhook_path(webhook), class: "btn-secondary btn-sm" do %>
+              Edit
+            <% end %>
+            <%= button_to settings_webhook_path(webhook), method: :delete,
+                data: { turbo_confirm: "Delete webhook \"#{webhook.name}\"?" },
+                class: "btn-danger btn-sm" do %>
+              Delete
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="card py-20 text-center">
+      <div class="text-5xl mb-4">🔔</div>
+      <p class="text-gray-400 font-medium">No webhooks yet</p>
+      <p class="text-gray-600 text-sm mt-1">Create a webhook to notify external services when blog events occur.</p>
+      <%= link_to "Create Webhook", new_settings_webhook_path, class: "btn-primary mt-4 mx-auto" %>
+    </div>
+  <% end %>
+</div>
