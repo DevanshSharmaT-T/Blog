@@ -3,9 +3,9 @@
 <div class="page-header">
   <div>
     <h1 class="page-title">Delivery Log</h1>
-    <p class="page-subtitle"><%= @webhook.name %> — <code class="text-violet-400 text-xs"><%= @webhook.target_url %></code></p>
+    <p class="page-subtitle"><%= @webhook.name %> — <code class="text-violet-600 dark:text-violet-400 text-xs"><%= @webhook.target_url %></code></p>
   </div>
-  <%= link_to settings_webhooks_path, class: "btn-secondary" do %>
+  <%= link_to settings_webhooks_path, class: "btn btn-secondary" do %>
     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
     Back to Webhooks
   <% end %>
@@ -14,14 +14,14 @@
 <div class="page-content max-w-5xl">
   <% if @events.empty? %>
     <div class="card p-10 text-center">
-      <svg class="w-12 h-12 mx-auto text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-      <p class="text-gray-400 text-sm">No deliveries yet.</p>
+      <svg class="w-12 h-12 mx-auto text-gray-400 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <p class="text-gray-700 dark:text-gray-300 text-sm">No deliveries yet.</p>
       <p class="text-gray-500 text-xs mt-1">Trigger any subscribed event (e.g. publish a blog) to see deliveries here.</p>
     </div>
   <% else %>
     <div class="card overflow-hidden" data-controller="delivery-log">
       <table class="w-full text-sm">
-        <thead class="bg-gray-900/50 text-xs uppercase text-gray-500 tracking-wider">
+        <thead class="bg-gray-50 dark:bg-gray-900/50 text-xs uppercase text-gray-500 tracking-wider">
           <tr>
             <th class="text-left px-4 py-3">Event</th>
             <th class="text-left px-4 py-3">Status</th>
@@ -31,13 +31,13 @@
             <th class="px-4 py-3"></th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-800">
+        <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
           <% @events.each_with_index do |event, idx| %>
-            <tr class="hover:bg-gray-900/40 cursor-pointer transition-colors"
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-900/40 cursor-pointer transition-colors"
                 data-delivery-log-target="row"
                 data-action="click->delivery-log#toggle"
                 data-index="<%= idx %>">
-              <td class="px-4 py-3 font-mono text-xs text-gray-200"><%= event.event_type %></td>
+              <td class="px-4 py-3 font-mono text-xs text-gray-800 dark:text-gray-200"><%= event.event_type %></td>
               <td class="px-4 py-3">
                 <% if event.status_code %>
                   <% color = event.status_code.between?(200, 299) ? "emerald" : event.status_code.between?(300, 399) ? "amber" : "red" %>
@@ -50,31 +50,31 @@
               </td>
               <td class="px-4 py-3">
                 <% if event.success %>
-                  <span class="text-emerald-400">✓</span>
+                  <span class="text-emerald-600 dark:text-emerald-400">✓</span>
                 <% else %>
-                  <span class="text-red-400">✗</span>
+                  <span class="text-red-600 dark:text-red-400">✗</span>
                 <% end %>
               </td>
-              <td class="px-4 py-3 text-gray-400 text-xs"><%= event.duration_ms ? "#{event.duration_ms} ms" : "—" %></td>
-              <td class="px-4 py-3 text-gray-400 text-xs"><%= event.created_at.strftime("%b %d, %Y · %H:%M:%S") %></td>
+              <td class="px-4 py-3 text-gray-600 dark:text-gray-400 text-xs"><%= event.duration_ms ? "#{event.duration_ms} ms" : "—" %></td>
+              <td class="px-4 py-3 text-gray-600 dark:text-gray-400 text-xs"><%= event.created_at.strftime("%b %d, %Y · %H:%M:%S") %></td>
               <td class="px-4 py-3 text-right">
                 <svg class="w-4 h-4 text-gray-500 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
               </td>
             </tr>
             <tr data-delivery-log-target="payload" class="hidden" data-index="<%= idx %>">
-              <td colspan="6" class="px-4 py-3 bg-gray-950/60">
+              <td colspan="6" class="px-4 py-3 bg-gray-50 dark:bg-gray-950/60">
                 <% if event.error_message.present? %>
                   <div class="mb-3">
                     <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Error</p>
-                    <pre class="text-xs text-red-300 whitespace-pre-wrap"><%= event.error_message %></pre>
+                    <pre class="text-xs text-red-700 dark:text-red-300 whitespace-pre-wrap"><%= event.error_message %></pre>
                   </div>
                 <% end %>
                 <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Payload</p>
-                <pre class="text-xs text-gray-300 overflow-x-auto font-mono leading-relaxed"><%= JSON.pretty_generate(event.payload || {}) %></pre>
+                <pre class="text-xs text-gray-700 dark:text-gray-300 overflow-x-auto font-mono leading-relaxed"><%= JSON.pretty_generate(event.payload || {}) %></pre>
                 <% if !event.success %>
                   <div class="mt-3">
                     <%= button_to "Retry", retry_event_settings_webhook_path(@webhook, event_id: event.id),
-                          method: :post, class: "btn-secondary text-xs" %>
+                          method: :post, class: "btn btn-secondary text-xs" %>
                   </div>
                 <% end %>
               </td>

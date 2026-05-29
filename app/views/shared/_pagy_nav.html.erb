@@ -1,39 +1,39 @@
 <%# Pagy navigation partial — include in any paginated view %>
 <% if pagy.pages > 1 %>
-  <div class="flex items-center justify-between px-4 py-4 border-t border-gray-800" aria-label="Pagination">
+  <div class="flex items-center justify-between px-4 py-4 border-t border-gray-200 dark:border-gray-800" aria-label="Pagination">
     <p class="text-sm text-gray-500">
-      Showing <span class="font-medium text-gray-300"><%= pagy.from %>–<%= pagy.to %></span>
-      of <span class="font-medium text-gray-300"><%= pagy.count %></span> results
+      Showing <span class="font-medium text-gray-700 dark:text-gray-300"><%= pagy.from %>–<%= pagy.to %></span>
+      of <span class="font-medium text-gray-700 dark:text-gray-300"><%= pagy.count %></span> results
     </p>
     <div class="flex items-center gap-1">
       <% if pagy.prev %>
-        <%= link_to pagy_url_for(pagy, pagy.prev), class: "btn-secondary btn-sm", aria: { label: "Previous page" } do %>
+        <%= link_to pagy_url_for(pagy, pagy.prev), class: "btn btn-secondary btn-sm", aria: { label: "Previous page" } do %>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         <% end %>
       <% else %>
-        <span class="btn-secondary btn-sm opacity-40 cursor-not-allowed" aria-disabled="true">
+        <span class="btn btn-secondary btn-sm opacity-40 cursor-not-allowed" aria-disabled="true">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         </span>
       <% end %>
 
       <% pagy_series(pagy).each do |item| %>
         <% if item == :gap %>
-          <span class="px-2 text-gray-600">…</span>
+          <span class="px-2 text-gray-400 dark:text-gray-600">…</span>
         <% elsif item == pagy.page %>
           <span class="step-active w-8 h-8 text-sm" aria-current="page"><%= item %></span>
         <% else %>
           <%= link_to item.to_s, pagy_url_for(pagy, item),
-              class: "step-pending w-8 h-8 text-sm hover:text-white hover:border-gray-600 transition-colors",
+              class: "step-pending w-8 h-8 text-sm hover:text-gray-900 dark:hover:text-white hover:border-gray-400 dark:hover:border-gray-600 transition-colors",
               aria: { label: "Page #{item}" } %>
         <% end %>
       <% end %>
 
       <% if pagy.next %>
-        <%= link_to pagy_url_for(pagy, pagy.next), class: "btn-secondary btn-sm", aria: { label: "Next page" } do %>
+        <%= link_to pagy_url_for(pagy, pagy.next), class: "btn btn-secondary btn-sm", aria: { label: "Next page" } do %>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         <% end %>
       <% else %>
-        <span class="btn-secondary btn-sm opacity-40 cursor-not-allowed" aria-disabled="true">
+        <span class="btn btn-secondary btn-sm opacity-40 cursor-not-allowed" aria-disabled="true">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         </span>
       <% end %>

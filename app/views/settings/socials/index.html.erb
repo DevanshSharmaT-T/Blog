@@ -11,14 +11,14 @@
 
   <!-- Connected platforms -->
   <div class="card overflow-hidden">
-    <div class="px-6 py-4 border-b border-gray-800">
-      <h2 class="text-base font-semibold text-white">Your Connections</h2>
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+      <h2 class="text-base font-semibold text-gray-900 dark:text-white">Your Connections</h2>
     </div>
     <% if @user_socials.any? %>
-      <div class="divide-y divide-gray-800">
+      <div class="divide-y divide-gray-200 dark:divide-gray-800">
         <% @user_socials.each do |social| %>
           <div class="flex items-center gap-4 px-6 py-4">
-            <div class="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center text-lg">
+            <div class="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-lg">
               <%= {
                 'twitter' => '𝕏', 'instagram' => '📸', 'linkedin' => '💼',
                 'facebook' => '👤', 'youtube' => '▶️', 'tiktok' => '🎵',
@@ -26,8 +26,8 @@
               }[social.social_platform.slug] || '🔗' %>
             </div>
             <div class="flex-1">
-              <p class="text-sm font-medium text-white"><%= social.social_platform.name %></p>
-              <p class="text-xs text-gray-400">@<%= social.handle %></p>
+              <p class="text-sm font-medium text-gray-900 dark:text-white"><%= social.social_platform.name %></p>
+              <p class="text-xs text-gray-600 dark:text-gray-400">@<%= social.handle %></p>
               <% if social.follower_count %>
                 <p class="text-xs text-gray-500"><%= number_with_delimiter(social.follower_count) %> followers</p>
               <% end %>
@@ -40,7 +40,7 @@
             <% end %>
             <%= button_to settings_social_path(social), method: :delete,
                 data: { turbo_confirm: "Disconnect #{social.social_platform.name}?" },
-                class: "btn-danger btn-sm", aria: { label: "Disconnect #{social.social_platform.name}" } do %>
+                class: "btn btn-danger btn-sm", aria: { label: "Disconnect #{social.social_platform.name}" } do %>
               Disconnect
             <% end %>
           </div>
@@ -55,7 +55,7 @@
 
   <!-- Add new connection -->
   <div class="card p-6">
-    <h2 class="text-base font-semibold text-white mb-5">Connect a Platform</h2>
+    <h2 class="text-base font-semibold text-gray-900 dark:text-white mb-5">Connect a Platform</h2>
     <%= form_with url: settings_socials_path, method: :post, html: { class: "space-y-4" } do |f| %>
       <div class="form-group">
         <label for="social_platform_id" class="form-label">Platform</label>
@@ -71,16 +71,16 @@
         <input type="text" name="handle" id="handle" class="form-input" placeholder="e.g. @yourname" required>
       </div>
       <div class="form-group">
-        <label for="profile_url" class="form-label">Profile URL <span class="text-gray-600">(optional)</span></label>
+        <label for="profile_url" class="form-label">Profile URL <span class="text-gray-500">(optional)</span></label>
         <input type="url" name="profile_url" id="profile_url" class="form-input" placeholder="https://…">
       </div>
       <div class="flex items-center gap-3">
         <input type="checkbox" name="is_public" id="is_public" value="1" checked
-               class="rounded border-gray-600 bg-gray-800 text-violet-600 focus:ring-violet-500">
-        <label for="is_public" class="text-sm text-gray-300">Show on public profile</label>
+               class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-violet-600 focus:ring-violet-500">
+        <label for="is_public" class="text-sm text-gray-700 dark:text-gray-300">Show on public profile</label>
       </div>
       <div class="flex justify-end">
-        <button type="submit" class="btn-primary">Connect Platform</button>
+        <button type="submit" class="btn btn-primary">Connect Platform</button>
       </div>
     <% end %>
   </div>

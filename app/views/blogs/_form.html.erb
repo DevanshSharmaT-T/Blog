@@ -16,7 +16,7 @@
     <p class="page-subtitle">Step <%= step_index + 1 %> of <%= steps.size %> — <%= steps[step_index][:label] %></p>
   </div>
   <% if @blog&.id %>
-    <%= link_to blogs_path, class: "btn-secondary" do %>
+    <%= link_to blogs_path, class: "btn btn-secondary" do %>
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       Cancel
     <% end %>
@@ -24,28 +24,45 @@
 </div>
 
 <!-- Step indicators -->
-<div class="px-8 py-4 border-b border-gray-800">
+<div class="px-8 py-4 border-b border-gray-200 dark:border-gray-800">
   <div class="flex items-center gap-2">
     <% steps.each_with_index do |step, i| %>
-      <div class="flex items-center gap-2">
-        <div class="<%= i < step_index ? 'step-done' : i == step_index ? 'step-active' : 'step-pending' %>"
-             aria-label="Step <%= i + 1 %>: <%= step[:label] %> (<%= i < step_index ? 'done' : i == step_index ? 'current' : 'pending' %>)">
+      <%
+        state_class = i < step_index ? 'step-done' : i == step_index ? 'step-active' : 'step-pending'
+        label_class = i == step_index ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-500'
+        aria_state  = i < step_index ? 'done' : i == step_index ? 'current' : 'pending'
+        aria_current = i == step_index ? 'step' : nil
+      %>
+      <% inner = capture do %>
+        <div class="<%= state_class %>"
+             aria-label="Step <%= i + 1 %>: <%= step[:label] %> (<%= aria_state %>)">
           <% if i < step_index %>
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
           <% else %>
             <%= i + 1 %>
           <% end %>
         </div>
-        <span class="text-sm <%= i == step_index ? 'text-white font-medium' : 'text-gray-500' %>"><%= step[:label] %></span>
-      </div>
+        <span class="text-sm <%= label_class %>"><%= step[:label] %></span>
+      <% end %>
+
+      <% if @blog&.persisted? %>
+        <%= link_to edit_blog_path(@blog, step: step[:key]),
+              class: "flex items-center gap-2 rounded-lg px-1 -mx-1 hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 transition-opacity",
+              aria: { current: aria_current } do %>
+          <%= inner %>
+        <% end %>
+      <% else %>
+        <div class="flex items-center gap-2"><%= inner %></div>
+      <% end %>
+
       <% if i < steps.length - 1 %>
-        <div class="flex-1 h-px bg-gray-800 mx-2"></div>
+        <div class="flex-1 h-px bg-gray-200 dark:bg-gray-800 mx-2"></div>
       <% end %>
     <% end %>
   </div>
 </div>
 
-<div class="page-content max-w-4xl">
+<div class="page-content">
   <%= form_with model: @blog,
       url: @blog&.id ? blog_path(@blog) : blogs_path,
       method: @blog&.id ? :patch : :post,
@@ -55,8 +72,8 @@
 
     <% if @blog&.errors&.any? %>
       <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-4" role="alert">
-        <p class="text-red-400 font-medium text-sm mb-2">Please fix the following errors:</p>
-        <ul class="list-disc list-inside text-red-300 text-sm space-y-1">
+        <p class="text-red-600 dark:text-red-400 font-medium text-sm mb-2">Please fix the following errors:</p>
+        <ul class="list-disc list-inside text-red-700 dark:text-red-300 text-sm space-y-1">
           <% @blog.errors.full_messages.each do |msg| %>
             <li><%= msg %></li>
           <% end %>
@@ -68,8 +85,8 @@
     <% if current_step.to_sym == :topics %>
       <div class="card p-6 space-y-6">
         <div>
-          <h2 class="text-lg font-semibold text-white mb-1">Choose Topics</h2>
-          <p class="text-sm text-gray-400">Select topics that best describe your blog post. At least 2 improves your promotion score.</p>
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Choose Topics</h2>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Select topics that best describe your blog post. At least 2 improves your promotion score.</p>
         </div>
 
         <!-- Title (collected on first step) -->
@@ -84,7 +101,7 @@
           <% if @blog.respond_to?(:slug) %>
             <%= f.hidden_field :slug, data: { slug_target: "slugInput", action: "input->slug#slugChanged" } %>
           <% end %>
-          <p class="form-hint">URL preview: <code class="text-violet-400">/blog/<span data-slug-target="preview">your-slug-here</span></code></p>
+          <p class="form-hint">URL preview: <code class="text-violet-600 dark:text-violet-400">/blog/<span data-slug-target="preview">your-slug-here</span></code></p>
         </div>
 
         <!-- Topics multi-select -->
@@ -92,26 +109,26 @@
           <p class="form-label">Topics</p>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2" id="topic-grid">
             <% (@topics || Topic.active.by_name).each do |topic| %>
-              <label class="topic-chip flex items-center gap-3 p-3 rounded-xl border border-gray-700 cursor-pointer hover:border-violet-500/50 transition-all duration-150 has-[:checked]:border-violet-500 has-[:checked]:bg-violet-500/10">
+              <label class="topic-chip">
                 <input type="checkbox" name="blog[topic_ids][]" value="<%= topic.id %>"
                        id="topic_<%= topic.id %>"
                        <%= @selected_topic_ids&.include?(topic.id) ? 'checked' : '' %>
-                       class="rounded border-gray-600 bg-gray-800 text-violet-600 focus:ring-violet-500">
+                       class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-violet-600 focus:ring-violet-500">
                 <div>
                   <% if topic.color_hex %>
                     <div class="w-3 h-3 rounded-full mb-1 inline-block" style="background-color: <%= topic.color_hex %>"></div>
                   <% end %>
-                  <p class="text-sm font-medium text-gray-200"><%= topic.name %></p>
+                  <p class="text-sm font-medium text-gray-800 dark:text-gray-200"><%= topic.name %></p>
                   <p class="text-xs text-gray-500"><%= pluralize(topic.post_count, 'post') %></p>
                 </div>
               </label>
             <% end %>
           </div>
-          <p class="form-hint mt-2">Can't find the right topic? <%= link_to "Create one", new_topic_path, class: "text-violet-400 hover:text-violet-300", target: "_blank" %></p>
+          <p class="form-hint mt-2">Can't find the right topic? <%= link_to "Create one", new_topic_path, class: "text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300", target: "_blank" %></p>
         </div>
 
         <div class="flex justify-end">
-          <%= f.submit "Continue to Content →", class: "btn-primary" %>
+          <%= f.submit "Continue to Content →", class: "btn btn-primary" %>
         </div>
       </div>
 
@@ -160,18 +177,18 @@
 
           <!-- Drag & drop zone -->
           <div data-image-upload-target="dropzone"
-               class="mt-2 mb-3 border-2 border-dashed border-gray-700 rounded-xl p-6 text-center transition-colors cursor-pointer hover:border-gray-600"
+               class="mt-2 mb-3 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-6 text-center transition-colors cursor-pointer hover:border-violet-400 dark:hover:border-violet-500"
                data-action="click->image-upload#pickFile">
-            <svg class="w-8 h-8 mx-auto text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.9 5 5 0 019.9-1A5.5 5.5 0 0118.5 16H7z"/></svg>
-            <p class="text-sm text-gray-400">Drag &amp; drop an image, or <span class="text-violet-400 underline">browse</span></p>
+            <svg class="w-8 h-8 mx-auto text-gray-400 dark:text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.9 5 5 0 019.9-1A5.5 5.5 0 0118.5 16H7z"/></svg>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Drag &amp; drop an image, or <span class="text-violet-600 dark:text-violet-400 underline">browse</span></p>
             <p class="text-xs text-gray-500 mt-1">PNG, JPG, WebP up to 10 MB</p>
             <input type="file" accept="image/*" class="hidden"
                    data-image-upload-target="fileInput"
                    data-action="change->image-upload#fileChosen">
           </div>
 
-          <div data-image-upload-target="spinner" class="hidden text-sm text-violet-400 mb-2">Uploading…</div>
-          <div data-image-upload-target="error"   class="hidden text-sm text-red-400 mb-2"></div>
+          <div data-image-upload-target="spinner" class="hidden text-sm text-violet-600 dark:text-violet-400 mb-2">Uploading…</div>
+          <div data-image-upload-target="error"   class="hidden text-sm text-red-500 dark:text-red-400 mb-2"></div>
 
           <%= f.url_field :cover_image_url,
                 class: "form-input",
@@ -188,13 +205,13 @@
             <img data-cover-preview-target="image" data-image-upload-target="image"
                  src="<%= @blog.cover_image_url %>"
                  alt="Cover preview"
-                 class="w-full h-48 object-cover rounded-xl border border-gray-700">
+                 class="w-full h-48 object-cover rounded-xl border border-gray-200 dark:border-gray-700">
           </div>
         </div>
 
         <!-- SEO fields -->
         <div class="card p-5 space-y-4">
-          <h3 class="text-sm font-semibold text-white">SEO Settings</h3>
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-white">SEO Settings</h3>
 
           <div class="form-group" data-controller="char-counter" data-char-counter-max-value="70">
             <%= f.label :seo_title, "SEO Title", class: "form-label" %>
@@ -205,7 +222,7 @@
                   id: "seo_title",
                   data: { char_counter_target: "input", action: "input->char-counter#input" } %>
             <p class="form-hint"><span data-char-counter-target="counter">0</span>/70 characters · 30–60 is optimal</p>
-            <div class="mt-1 h-1 rounded-full bg-gray-800 overflow-hidden">
+            <div class="mt-1 h-1 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden">
               <div data-char-counter-target="bar" class="h-full rounded-full bg-emerald-500 transition-all duration-150" style="width: 0%"></div>
             </div>
           </div>
@@ -220,15 +237,15 @@
                   id: "seo_desc",
                   data: { char_counter_target: "input", action: "input->char-counter#input" } %>
             <p class="form-hint"><span data-char-counter-target="counter">0</span>/160 characters · 120–160 is optimal</p>
-            <div class="mt-1 h-1 rounded-full bg-gray-800 overflow-hidden">
+            <div class="mt-1 h-1 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden">
               <div data-char-counter-target="bar" class="h-full rounded-full bg-emerald-500 transition-all duration-150" style="width: 0%"></div>
             </div>
           </div>
         </div>
 
         <div class="flex justify-between">
-          <%= link_to "← Back to Topics", edit_blog_path(@blog, step: :topics), class: "btn-secondary" %>
-          <%= f.submit "Continue to Template →", class: "btn-primary" %>
+          <%= link_to "← Back to Topics", edit_blog_path(@blog, step: :topics), class: "btn btn-secondary" %>
+          <%= f.submit "Continue to Template →", class: "btn btn-primary" %>
         </div>
       </div>
 
@@ -304,8 +321,8 @@
         </div>
 
         <div class="flex justify-between mt-6">
-          <%= link_to "← Back to Content", edit_blog_path(@blog, step: :content), class: "btn-secondary" %>
-          <%= f.submit "Continue to Review →", class: "btn-primary" %>
+          <%= link_to "← Back to Content", edit_blog_path(@blog, step: :content), class: "btn btn-secondary" %>
+          <%= f.submit "Continue to Review →", class: "btn btn-primary" %>
         </div>
       </div>
 
@@ -314,12 +331,12 @@
       <div class="space-y-5">
         <!-- Summary card -->
         <div class="card p-6 space-y-4">
-          <h2 class="text-lg font-semibold text-white">Review & Publish</h2>
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Review & Publish</h2>
 
           <div class="grid grid-cols-2 gap-4 text-sm">
             <div>
               <p class="text-gray-500">Title</p>
-              <p class="text-white font-medium mt-0.5"><%= @blog.title %></p>
+              <p class="text-gray-900 dark:text-white font-medium mt-0.5"><%= @blog.title %></p>
             </div>
             <div>
               <p class="text-gray-500">Status</p>
@@ -327,11 +344,11 @@
             </div>
             <div>
               <p class="text-gray-500">Word Count</p>
-              <p class="text-white mt-0.5"><%= number_with_delimiter(@blog.word_count) %> words · ~<%= @blog.reading_time_mins %> min read</p>
+              <p class="text-gray-900 dark:text-white mt-0.5"><%= number_with_delimiter(@blog.word_count) %> words · ~<%= @blog.reading_time_mins %> min read</p>
             </div>
             <div>
               <p class="text-gray-500">Template</p>
-              <p class="text-white mt-0.5"><%= @blog.template&.name || "Default" %></p>
+              <p class="text-gray-900 dark:text-white mt-0.5"><%= @blog.template&.name || "Default" %></p>
             </div>
             <div>
               <p class="text-gray-500">Topics</p>
@@ -356,7 +373,7 @@
                 <%= score[:value] || 0 %>
               </div>
               <div class="text-xs text-gray-500 mt-1"><%= score[:label] %></div>
-              <div class="mt-3 h-1.5 rounded-full bg-gray-800 overflow-hidden">
+              <div class="mt-3 h-1.5 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden">
                 <div class="h-full rounded-full bg-<%= score[:color] %>-500"
                      style="width: <%= score[:value] || 0 %>%"></div>
               </div>
@@ -366,19 +383,19 @@
 
         <!-- Publish actions -->
         <div class="card p-6 space-y-4">
-          <h3 class="text-base font-semibold text-white">Publishing Options</h3>
+          <h3 class="text-base font-semibold text-gray-900 dark:text-white">Publishing Options</h3>
           <div class="flex flex-wrap gap-3">
-            <%= button_to publish_blog_path(@blog), method: :patch, class: "btn-primary", aria: { label: "Publish now" } do %>
+            <%= button_to publish_blog_path(@blog), method: :patch, class: "btn btn-primary", aria: { label: "Publish now" } do %>
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
               Publish Now
             <% end %>
 
-            <button type="button" onclick="document.getElementById('schedule-form').classList.toggle('hidden')" class="btn-secondary">
+            <button type="button" onclick="document.getElementById('schedule-form').classList.toggle('hidden')" class="btn btn-secondary">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
               Schedule
             </button>
 
-            <%= button_to submit_review_blog_path(@blog), method: :patch, class: "btn-secondary" do %>
+            <%= button_to submit_review_blog_path(@blog), method: :patch, class: "btn btn-secondary" do %>
               Submit for Review
             <% end %>
           </div>
@@ -391,14 +408,14 @@
                 <%= sf.datetime_local_field :scheduled_at, class: "form-input",
                     min: Time.current.strftime("%Y-%m-%dT%H:%M"),
                     aria: { label: "Schedule publish date and time" } %>
-                <%= sf.submit "Schedule →", class: "btn-primary" %>
+                <%= sf.submit "Schedule →", class: "btn btn-primary" %>
               </div>
             <% end %>
           </div>
         </div>
 
         <div class="flex justify-between">
-          <%= link_to "← Back to Template", edit_blog_path(@blog, step: :template), class: "btn-secondary" %>
+          <%= link_to "← Back to Template", edit_blog_path(@blog, step: :template), class: "btn btn-secondary" %>
         </div>
       </div>
     <% end %>

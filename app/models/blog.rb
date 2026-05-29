@@ -26,7 +26,7 @@ class Blog < ApplicationRecord
   validates :title,          presence: true, length: { maximum: 255 }
   validates :slug,           presence: true, uniqueness: true, length: { maximum: 255 },
                              format: { with: /\A[a-z0-9-]+\z/, message: "must be lowercase with hyphens only" }
-  validates :content,        presence: true
+  validates :content,        presence: true, unless: :draft_status?
   validates :content_format, presence: true
   validates :status,         presence: true
   validates :seo_title,      length: { maximum: 70 }, allow_blank: true
@@ -93,7 +93,7 @@ class Blog < ApplicationRecord
   end
 
   def calculate_word_count
-    self.word_count = content.split.size
+    self.word_count = content.to_s.split.size
   end
 
   def calculate_reading_time

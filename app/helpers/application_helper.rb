@@ -1,8 +1,7 @@
 module ApplicationHelper
   PUBLIC_PAGES = {
-    "pages"  => :any,
-    "blogs"  => %w[show archive feed],
-    "topics" => %w[index show]
+    "pages" => :any,
+    "blogs" => %w[show archive feed]
   }.freeze
 
   def public_page?

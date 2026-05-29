@@ -20,13 +20,13 @@
               params.dig(:q, :role_eq)
             ),
             {}, class: "form-input w-40" %>
-      <%= s.submit "Filter", class: "btn-secondary" %>
+      <%= s.submit "Filter", class: "btn btn-secondary" %>
     </div>
   <% end %>
 
   <div class="card overflow-hidden">
     <table class="w-full text-sm">
-      <thead class="bg-gray-900/50 text-xs uppercase text-gray-500 tracking-wider">
+      <thead class="bg-gray-50 dark:bg-gray-900/50 text-xs uppercase text-gray-500 tracking-wider">
         <tr>
           <th class="text-left px-4 py-3">User</th>
           <th class="text-left px-4 py-3">Role</th>
@@ -36,9 +36,9 @@
           <th class="text-right px-4 py-3">Actions</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-gray-800">
+      <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
         <% @users.each do |user| %>
-          <tr class="hover:bg-gray-900/40 transition-colors">
+          <tr class="hover:bg-gray-50 dark:hover:bg-gray-900/40 transition-colors">
             <td class="px-4 py-3">
               <%= link_to user_path(user), class: "flex items-center gap-3 group" do %>
                 <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-indigo-500 flex items-center justify-center text-white text-xs font-semibold shrink-0 overflow-hidden">
@@ -49,7 +49,7 @@
                   <% end %>
                 </div>
                 <div>
-                  <p class="text-sm font-medium text-white group-hover:text-violet-400 transition-colors"><%= user.name %></p>
+                  <p class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors"><%= user.name %></p>
                   <p class="text-xs text-gray-500"><%= user.email %></p>
                 </div>
               <% end %>
@@ -67,10 +67,10 @@
                 <span class="text-gray-500 text-xs">● Inactive</span>
               <% end %>
             </td>
-            <td class="px-4 py-3 text-xs text-gray-400">
+            <td class="px-4 py-3 text-xs text-gray-600 dark:text-gray-400">
               <%= user.last_login_at ? time_ago_in_words(user.last_login_at) + " ago" : "—" %>
             </td>
-            <td class="px-4 py-3 text-xs text-gray-400">
+            <td class="px-4 py-3 text-xs text-gray-600 dark:text-gray-400">
               <%= user.created_at.strftime("%b %d, %Y") %>
             </td>
             <td class="px-4 py-3 text-right">
@@ -90,7 +90,7 @@
 
                 <% if can?(:toggle_active, user) && user != current_user %>
                   <%= button_to toggle_active_user_path(user), method: :patch,
-                        class: "btn-secondary text-xs py-1 px-2",
+                        class: "btn btn-secondary text-xs py-1 px-2",
                         title: (user.is_active ? "Deactivate" : "Activate") do %>
                     <%= user.is_active ? "Deactivate" : "Activate" %>
                   <% end %>
@@ -99,7 +99,7 @@
                 <% if can?(:destroy, user) && user != current_user %>
                   <%= button_to user_path(user), method: :delete,
                         data: { turbo_confirm: "Soft-delete this user? They will be unable to sign in." },
-                        class: "btn-secondary text-xs py-1 px-2 text-red-400 hover:text-red-300" do %>
+                        class: "btn btn-secondary text-xs py-1 px-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300" do %>
                     Delete
                   <% end %>
                 <% end %>

@@ -10,7 +10,7 @@
 
       <% if @webhook.errors.any? %>
         <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
-          <ul class="text-red-400 text-sm space-y-1 list-disc list-inside">
+          <ul class="text-red-600 dark:text-red-400 text-sm space-y-1 list-disc list-inside">
             <% @webhook.errors.full_messages.each do |msg| %>
               <li><%= msg %></li>
             <% end %>
@@ -44,14 +44,14 @@
             ["blog.scheduled", "Blog scheduled"],
             ["analytics.synced", "Analytics synced"]
           ].each do |event_key, event_label| %>
-            <label class="flex items-center gap-3 p-3 rounded-xl border border-gray-700 cursor-pointer
-                          hover:border-gray-600 has-[:checked]:border-violet-500/50 has-[:checked]:bg-violet-500/5 transition-all">
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-gray-300 dark:border-gray-700 cursor-pointer
+                          hover:border-gray-400 dark:hover:border-gray-600 has-[:checked]:border-violet-500/50 has-[:checked]:bg-violet-500/5 transition-all">
               <input type="checkbox" name="api_webhook[events][]" value="<%= event_key %>"
                      id="event_<%= event_key.gsub('.', '_') %>"
                      <%= @webhook.events&.include?(event_key) ? 'checked' : '' %>
-                     class="rounded border-gray-600 bg-gray-800 text-violet-600 focus:ring-violet-500">
+                     class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-violet-600 focus:ring-violet-500">
               <div>
-                <p class="text-sm font-medium text-gray-200"><%= event_label %></p>
+                <p class="text-sm font-medium text-gray-800 dark:text-gray-200"><%= event_label %></p>
                 <p class="text-xs text-gray-500 font-mono"><%= event_key %></p>
               </div>
             </label>
@@ -61,14 +61,14 @@
 
       <div class="flex items-center gap-3">
         <%= f.check_box :is_active, id: "webhook_is_active",
-            class: "rounded border-gray-600 bg-gray-800 text-violet-600 focus:ring-violet-500" %>
-        <%= f.label :is_active, "Active", class: "text-sm text-gray-300" %>
+            class: "rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-violet-600 focus:ring-violet-500" %>
+        <%= f.label :is_active, "Active", class: "text-sm text-gray-700 dark:text-gray-300" %>
       </div>
 
       <% unless @webhook.new_record? %>
-        <div class="bg-gray-800/50 rounded-xl p-4">
+        <div class="bg-gray-100/60 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-200 dark:border-transparent">
           <p class="text-xs text-gray-500 mb-1">HMAC Secret — used to verify webhook signatures</p>
-          <p class="text-xs text-gray-600 font-mono">
+          <p class="text-xs text-gray-600 dark:text-gray-400 font-mono">
             <%# Never display the secret — it's encrypted. Show instructions instead. %>
             Your secret was generated when this webhook was created. It cannot be displayed again.
             Delete and recreate to rotate it.
@@ -78,8 +78,8 @@
     </div>
 
     <div class="flex items-center gap-3">
-      <%= f.submit @webhook.new_record? ? "Create Webhook" : "Save Changes", class: "btn-primary" %>
-      <%= link_to "Cancel", settings_webhooks_path, class: "btn-secondary" %>
+      <%= f.submit @webhook.new_record? ? "Create Webhook" : "Save Changes", class: "btn btn-primary" %>
+      <%= link_to "Cancel", settings_webhooks_path, class: "btn btn-secondary" %>
     </div>
   <% end %>
 </div>

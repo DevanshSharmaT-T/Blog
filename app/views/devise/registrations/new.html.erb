@@ -1,64 +1,73 @@
 <% content_for :title, "Create Account" %>
 
-<div class="min-h-screen bg-gray-950 flex items-center justify-center px-4 py-12">
-  <div class="w-full max-w-md">
-    <div class="text-center mb-8">
-      <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 mb-4">
-        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
-      </div>
-      <h1 class="text-2xl font-bold text-white">Create your account</h1>
-      <p class="text-gray-400 text-sm mt-1">Start publishing great content today</p>
+<div class="min-h-screen flex bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100" data-controller="theme">
+  <%= render "devise/shared/brand_panel" %>
+
+  <section class="flex-1 lg:w-1/2 flex flex-col">
+    <div class="flex items-center justify-between px-6 lg:px-10 py-5">
+      <%= link_to root_path, class: "inline-flex items-center gap-2 lg:invisible" do %>
+        <span class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+        </span>
+        <span class="font-bold tracking-tight text-gray-900 dark:text-white">MyBlog</span>
+      <% end %>
+      <button type="button" class="theme-toggle" data-action="theme#toggle" aria-label="Toggle color theme">
+        <svg class="icon-sun w-4 h-4"  fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <svg class="icon-moon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+      </button>
     </div>
 
-    <div class="card p-8 space-y-5">
-      <%= form_for(resource, as: resource_name, url: registration_path(resource_name),
-                   html: { class: "space-y-5" }) do |f| %>
-
-        <%= render "devise/shared/error_messages", resource: resource %>
-
-        <div class="form-group">
-          <%= f.label :name, "Full Name", class: "form-label" %>
-          <%= f.text_field :name, autofocus: true, autocomplete: "name",
-              class: "form-input", placeholder: "Jane Doe",
-              aria: { label: "Full name", required: true } %>
-        </div>
-
-        <div class="form-group">
-          <%= f.label :email, class: "form-label" %>
-          <%= f.email_field :email, autocomplete: "email",
-              class: "form-input", placeholder: "you@example.com",
-              aria: { label: "Email address", required: true } %>
-        </div>
-
-        <div class="form-group">
-          <%= f.label :password, class: "form-label" %>
-          <% if @minimum_password_length %>
-            <p class="form-hint mb-1">Minimum <%= @minimum_password_length %> characters</p>
-          <% end %>
-          <%= f.password_field :password, autocomplete: "new-password",
-              class: "form-input", placeholder: "••••••••",
-              aria: { label: "Password", required: true } %>
-        </div>
-
-        <div class="form-group">
-          <%= f.label :password_confirmation, "Confirm Password", class: "form-label" %>
-          <%= f.password_field :password_confirmation, autocomplete: "new-password",
-              class: "form-input", placeholder: "••••••••",
-              aria: { label: "Confirm password", required: true } %>
-        </div>
-
-        <div class="bg-violet-500/5 border border-violet-500/20 rounded-xl p-4">
-          <p class="text-xs text-gray-400">
-            By creating an account, you'll be able to write and publish blog posts. You'll receive a confirmation email to verify your account.
+    <div class="flex-1 flex items-center justify-center px-6 lg:px-10 py-10">
+      <div class="w-full max-w-md">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Create your account</h1>
+          <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            Start publishing great content today.
           </p>
         </div>
 
-        <%= f.submit "Create Account", class: "btn-primary w-full justify-center py-3 text-base" %>
-      <% end %>
+        <%= form_for(resource, as: resource_name, url: registration_path(resource_name),
+                     html: { class: "space-y-5" }) do |f| %>
 
-      <div class="pt-4 border-t border-gray-800 text-center">
-        <%= render "devise/shared/links" %>
+          <%= render "devise/shared/error_messages", resource: resource %>
+
+          <div class="form-group">
+            <%= f.label :name, "Full name", class: "form-label" %>
+            <%= f.text_field :name, autofocus: true, autocomplete: "name",
+                class: "form-input", placeholder: "Jane Doe",
+                aria: { label: "Full name", required: true } %>
+          </div>
+
+          <div class="form-group">
+            <%= f.label :email, class: "form-label" %>
+            <%= f.email_field :email, autocomplete: "email",
+                class: "form-input", placeholder: "you@example.com",
+                aria: { label: "Email address", required: true } %>
+          </div>
+
+          <%= render "devise/shared/password_field",
+                f: f, field: :password, label: "Password",
+                autocomplete: "new-password",
+                hint: (@minimum_password_length ? "Minimum #{@minimum_password_length} characters" : nil) %>
+
+          <%= render "devise/shared/password_field",
+                f: f, field: :password_confirmation, label: "Confirm password",
+                autocomplete: "new-password" %>
+
+          <div class="rounded-xl border border-violet-200/70 dark:border-violet-500/20 bg-violet-50/70 dark:bg-violet-500/5 px-4 py-3">
+            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+              By creating an account, you'll be able to write and publish blog posts.
+              You'll receive a confirmation email to verify your address.
+            </p>
+          </div>
+
+          <%= f.submit "Create account", class: "btn btn-primary w-full justify-center py-3 text-base" %>
+        <% end %>
+
+        <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-800">
+          <%= render "devise/shared/links" %>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 </div>

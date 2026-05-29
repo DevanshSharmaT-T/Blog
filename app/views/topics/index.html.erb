@@ -6,7 +6,7 @@
     <p class="page-subtitle">Browse and manage content categories</p>
   </div>
   <% if user_signed_in? && (current_user.owner_role? || current_user.admin_role?) %>
-    <%= link_to new_topic_path, class: "btn-primary" do %>
+    <%= link_to new_topic_path, class: "btn btn-primary" do %>
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
       New Topic
     <% end %>

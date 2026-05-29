@@ -10,7 +10,7 @@
 
       <% if @topic.errors.any? %>
         <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
-          <ul class="text-red-400 text-sm space-y-1 list-disc list-inside">
+          <ul class="text-red-600 dark:text-red-400 text-sm space-y-1 list-disc list-inside">
             <% @topic.errors.full_messages.each do |msg| %>
               <li><%= msg %></li>
             <% end %>
@@ -41,7 +41,7 @@
         <div class="form-group">
           <%= f.label :color_hex, "Accent Color", class: "form-label" %>
           <div class="flex items-center gap-3">
-            <%= f.color_field :color_hex, class: "w-10 h-10 rounded-lg border border-gray-700 bg-transparent cursor-pointer", id: "color_hex_picker" %>
+            <%= f.color_field :color_hex, class: "w-10 h-10 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent cursor-pointer", id: "color_hex_picker" %>
             <%= f.text_field :color_hex, class: "form-input font-mono", placeholder: "#6366f1",
                 pattern: "#[0-9A-Fa-f]{6}", maxlength: 7, id: "color_hex_text" %>
           </div>
@@ -71,15 +71,15 @@
 
       <div class="flex items-center gap-3">
         <%= f.check_box :is_active, id: "topic_is_active",
-            class: "rounded border-gray-600 bg-gray-800 text-violet-600 focus:ring-violet-500" %>
-        <%= f.label :is_active, "Active (visible to users)", class: "text-sm text-gray-300" %>
+            class: "rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-violet-600 focus:ring-violet-500" %>
+        <%= f.label :is_active, "Active (visible to users)", class: "text-sm text-gray-700 dark:text-gray-300" %>
       </div>
     </div>
 
     <div class="flex items-center gap-3">
       <%= f.submit @topic.new_record? ? "Create Topic" : "Update Topic",
-          class: "btn-primary" %>
-      <%= link_to "Cancel", topics_path, class: "btn-secondary" %>
+          class: "btn btn-primary" %>
+      <%= link_to "Cancel", topics_path, class: "btn btn-secondary" %>
     </div>
   <% end %>
 </div>
