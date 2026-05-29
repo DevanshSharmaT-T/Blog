@@ -169,7 +169,7 @@ class BlogsController < ApplicationController
 
   def set_blog
     @blog = if action_name == "show"
-              Blog.visible.find_by!(slug: params[:slug])
+              Blog.visible.includes(:template, :author, :topics).find_by!(slug: params[:slug])
             else
               Blog.not_deleted.find(params[:id])
             end

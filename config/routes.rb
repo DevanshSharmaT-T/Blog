@@ -14,7 +14,8 @@ Rails.application.routes.draw do
   get "blog/feed",      to: "blogs#feed",    as: :blog_feed, defaults: { format: :atom }
   get "blog/:slug",     to: "blogs#show",    as: :public_blog
   get "sitemap.xml",    to: "sitemaps#show", defaults: { format: :xml }, as: :sitemap
-  resources :topics, only: [ :index, :show ]
+  resources :topics,    only: [ :index, :show ]
+  resources :templates, only: [ :index, :show ]
 
   # ─── Authenticated Web UI ─────────────────────────────────────────────────────
   authenticated :user do
@@ -35,7 +36,7 @@ Rails.application.routes.draw do
     end
 
     resources :topics,    only: [ :new, :create, :edit, :update, :destroy ]
-    resources :templates
+    resources :templates, except: [ :index, :show ]
 
     resources :users, only: [ :index, :show, :update, :destroy ] do
       member do

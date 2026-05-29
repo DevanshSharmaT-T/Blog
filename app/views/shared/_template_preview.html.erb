@@ -1,0 +1,11 @@
+<%# Locals: template (required), aspect: "card" | "full" (default "card") %>
+<% aspect = local_assigns[:aspect].presence || "card" %>
+<div class="tpl-preview tpl-preview-<%= aspect %> tpl tpl-<%= template.slug %>" aria-hidden="true">
+  <div class="tpl-preview-title"><%= template.name %></div>
+  <div class="tpl-preview-deck">A snapshot of how a blog post looks in this template.</div>
+  <div class="tpl-preview-byline">By Jane Doe · Mar 12</div>
+  <div class="tpl-preview-body">
+    <p>The quick brown fox jumps over the lazy dog. Typography, palette, and rhythm define the reading experience.</p>
+    <p>Whitespace and hierarchy carry the eye from headline to body.</p>
+  </div>
+</div>

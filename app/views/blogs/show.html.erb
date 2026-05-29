@@ -1,7 +1,9 @@
 <% content_for :title, (@blog.seo_title.presence || @blog.title) %>
 <% content_for :meta_description, (@blog.seo_description.presence || @blog.excerpt.to_s.truncate(160)) %>
 
-<article class="reading-article"
+<% tpl_slug = @blog.template&.slug.presence || "medium-classic" %>
+<article class="reading-article tpl tpl-<%= tpl_slug %>"
+         data-template="<%= tpl_slug %>"
          itemscope itemtype="https://schema.org/BlogPosting">
 
   <!-- Reading progress bar (scroll-linked) -->

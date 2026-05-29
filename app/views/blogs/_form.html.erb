@@ -234,46 +234,69 @@
 
     <!-- STEP 3: Template -->
     <% elsif current_step.to_sym == :template %>
-      <div class="card p-6">
-        <h2 class="text-lg font-semibold text-white mb-5">Choose a Template</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" role="radiogroup" aria-label="Blog templates">
-          <!-- No template option -->
-          <label class="template-card cursor-pointer group">
-            <input type="radio" name="blog[template_id]" value="" <%= @blog.template_id.nil? ? 'checked' : '' %>
+      <%
+        all_templates = @templates || Template.active.order(:category, :name)
+        categories = ["all"] + all_templates.map(&:category).uniq.sort
+      %>
+      <div class="card p-6" data-controller="template-filter" data-template-filter-active-value="all">
+        <div class="flex items-start justify-between mb-5 flex-wrap gap-3">
+          <div>
+            <h2 class="text-lg font-semibold mb-1" style="color: var(--color-fg);">Choose a Template</h2>
+            <p class="text-sm" style="color: var(--color-fg-muted);">
+              <%= all_templates.size %> templates. Each defines the visual style of your published post.
+            </p>
+          </div>
+          <%= link_to "Browse full gallery →", templates_path, target: "_blank", rel: "noopener",
+                class: "text-sm", style: "color: var(--color-accent);" %>
+        </div>
+
+        <!-- Category filter chips -->
+        <nav class="reading-topics" style="margin-bottom: 1.5rem;" aria-label="Filter templates by category">
+          <% categories.each do |cat| %>
+            <button type="button"
+                    class="topic-pill <%= 'active' if cat == 'all' %>"
+                    data-template-filter-target="chip"
+                    data-category="<%= cat %>"
+                    data-action="template-filter#filter">
+              <%= cat.capitalize %>
+            </button>
+          <% end %>
+        </nav>
+
+        <div class="template-grid" role="radiogroup" aria-label="Blog templates">
+          <!-- No template / default -->
+          <label class="template-card" data-template-filter-target="card" data-category="all">
+            <input type="radio" name="blog[template_id]" value="" <%= 'checked' if @blog.template_id.nil? %>
                    class="sr-only" id="template_none">
-            <div class="border-2 rounded-2xl overflow-hidden transition-all duration-200
-                        <%= @blog.template_id.nil? ? 'border-violet-500 shadow-lg shadow-violet-500/20' : 'border-gray-700 group-hover:border-gray-600' %>">
-              <div class="h-36 bg-gray-800 flex items-center justify-center">
-                <span class="text-gray-500 text-sm">No Template</span>
+            <div class="template-card-inner template-card-default">
+              <div class="tpl-preview tpl-preview-card tpl tpl-medium-classic" aria-hidden="true">
+                <div class="tpl-preview-title">Default</div>
+                <div class="tpl-preview-deck">Plain content view — no template selected.</div>
+                <div class="tpl-preview-byline">By you · Today</div>
+                <div class="tpl-preview-body"><p>Same as Medium Classic, no extra styling.</p></div>
               </div>
-              <div class="p-3 bg-gray-900">
-                <p class="text-sm font-medium text-white">Default</p>
-                <p class="text-xs text-gray-500">Plain content view</p>
+              <div class="template-card-meta">
+                <p class="template-card-name">No template</p>
+                <p class="template-card-cat">Default look</p>
               </div>
             </div>
           </label>
 
-          <% (@templates || Template.active).each do |template| %>
-            <label class="template-card cursor-pointer group">
+          <% all_templates.each do |template| %>
+            <label class="template-card"
+                   data-template-filter-target="card"
+                   data-category="<%= template.category %>">
               <input type="radio" name="blog[template_id]" value="<%= template.id %>"
-                     <%= @blog.template_id == template.id ? 'checked' : '' %>
+                     <%= 'checked' if @blog.template_id == template.id %>
                      class="sr-only" id="template_<%= template.id %>">
-              <div class="border-2 rounded-2xl overflow-hidden transition-all duration-200
-                          template-option <%= @blog.template_id == template.id ? 'border-violet-500 shadow-lg shadow-violet-500/20' : 'border-gray-700 group-hover:border-gray-600' %>"
-                   data-template-id="<%= template.id %>">
-                <div class="h-36 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center relative">
-                  <% if template.thumbnail_url %>
-                    <img src="<%= template.thumbnail_url %>" alt="<%= template.name %> preview" class="w-full h-full object-cover">
-                  <% else %>
-                    <div class="text-4xl"><%= template.category == 'minimal' ? '📄' : template.category == 'magazine' ? '📰' : '🖼️' %></div>
-                  <% end %>
-                  <% if template.is_premium %>
-                    <span class="absolute top-2 right-2 badge badge-scheduled">Premium</span>
-                  <% end %>
-                </div>
-                <div class="p-3 bg-gray-900">
-                  <p class="text-sm font-medium text-white"><%= template.name %></p>
-                  <p class="text-xs text-gray-500 capitalize"><%= template.category %></p>
+              <div class="template-card-inner">
+                <%= render "shared/template_preview", template: template, aspect: "card" %>
+                <% if template.is_premium %>
+                  <span class="template-premium-badge">Premium</span>
+                <% end %>
+                <div class="template-card-meta">
+                  <p class="template-card-name"><%= template.name %></p>
+                  <p class="template-card-cat"><%= template.category.capitalize %></p>
                 </div>
               </div>
             </label>
