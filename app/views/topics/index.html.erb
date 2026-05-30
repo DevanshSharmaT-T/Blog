@@ -18,8 +18,8 @@
     <% @topics.each do |topic| %>
       <div class="card-hover p-5" style="--topic-color: <%= topic.color_hex || '#6366f1' %>;">
         <div class="flex items-start justify-between mb-3">
-          <div class="topic-icon-tile">
-            <span class="text-lg"><%= topic.icon_name ? "🏷️" : "📌" %></span>
+          <div class="topic-icon-tile" style="color: var(--topic-color);">
+            <%= topic_icon(topic.icon_name, class: "w-5 h-5") %>
           </div>
           <span class="text-xs" style="color: var(--color-fg-subtle);"><%= pluralize(topic.post_count, "post") %></span>
         </div>

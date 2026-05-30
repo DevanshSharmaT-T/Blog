@@ -16,11 +16,11 @@ module Users
     protected
 
     def configure_sign_up_params
-      devise_parameter_sanitizer.permit(:sign_up, keys: [:name])
+      devise_parameter_sanitizer.permit(:sign_up, keys: [:name, :username])
     end
 
     def configure_account_update_params
-      devise_parameter_sanitizer.permit(:account_update, keys: [:name, :avatar_url, :bio, :website_url])
+      devise_parameter_sanitizer.permit(:account_update, keys: [:name, :username, :avatar_url, :bio, :website_url])
     end
   end
 end

@@ -24,7 +24,7 @@ class Blog < ApplicationRecord
 
   # ─── Validations ─────────────────────────────────────────────────────────────
   validates :title,          presence: true, length: { maximum: 255 }
-  validates :slug,           presence: true, uniqueness: true, length: { maximum: 255 },
+  validates :slug,           presence: true, uniqueness: { scope: :author_id }, length: { maximum: 255 },
                              format: { with: /\A[a-z0-9-]+\z/, message: "must be lowercase with hyphens only" }
   validates :content,        presence: true, unless: :draft_status?
   validates :content_format, presence: true
@@ -60,7 +60,7 @@ class Blog < ApplicationRecord
 
   # ─── Instance Methods ─────────────────────────────────────────────────────────
   def soft_delete!
-    update!(deleted_at: Time.current, status: :archived)
+    update_columns(deleted_at: Time.current, status: :archived, updated_at: Time.current)
   end
 
   def deleted?
@@ -79,13 +79,42 @@ class Blog < ApplicationRecord
     update!(status: :review)
   end
 
+  # Canonical public URL on the author's sub-host: <username>.<apex>/blog/<slug>.
+  def public_url
+    opts = Rails.application.routes.default_url_options
+    Rails.application.routes.url_helpers.public_blog_url(
+      slug: slug, host: "#{author.username}.#{opts[:host]}", port: opts[:port]
+    )
+  end
+
+  # Rich payload for the `blog.published` webhook so connected automations
+  # (Zapier/Make/n8n, etc.) have everything needed to announce the post.
+  def published_webhook_payload
+    {
+      blog_id:         id,
+      title:           title,
+      slug:            slug,
+      url:             public_url,
+      excerpt:         excerpt,
+      cover_image_url: cover_image_url,
+      topics:          topics.map(&:name),
+      author_id:       author_id,
+      author_name:     author.name,
+      author_username: author.username,
+      author_socials:  author.user_socials.includes(:social_platform).where(is_public: true)
+                              .map { |s| { platform: s.social_platform.slug, handle: s.handle } },
+      published_at:    published_at&.iso8601
+    }
+  end
+
   private
 
   def generate_slug
     base = title.parameterize
     candidate = base
     counter = 1
-    while Blog.where.not(id: id).exists?(slug: candidate)
+    # Slugs are unique per author, so only check collisions within this author's blogs.
+    while Blog.where(author_id: author_id).where.not(id: id).exists?(slug: candidate)
       candidate = "#{base}-#{counter}"
       counter += 1
     end

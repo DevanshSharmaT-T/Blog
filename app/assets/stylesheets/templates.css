@@ -4,6 +4,10 @@
    app/views/blogs/show.html.erb. Same DOM → identical SEO/scrapeability.
    The base "medium-classic" look lives in application.css under the
    `.reading-*` family; each scope overrides only what differs.
+
+   Fonts (loaded in app/views/layouts/application.html.erb):
+   Inter, Merriweather, Playfair Display, Fraunces, Source Serif 4, Caveat,
+   Space Grotesk, JetBrains Mono.
    ════════════════════════════════════════════════════════════════════════════ */
 
 /* ── Shared modifier helpers (used by several scopes) ─────────────────────── */
@@ -16,27 +20,50 @@
    Family 1 — Editorial (10)
    ════════════════════════════════════════════════════════════════════════════ */
 
-/* 1. medium-classic — identity scope, no overrides */
-.tpl-medium-classic { /* default */ }
-
-/* 2. nyt-style */
-.tpl-nyt-style .reading-header::before {
-  content: "ESSAY"; display: block;
-  font-size: 0.7rem; letter-spacing: 0.25em;
-  color: var(--color-fg-subtle); margin-bottom: 1rem;
+/* 1. medium-classic — the reference look. Quiet identity: clean serif headline,
+   a single hairline rule under the byline, one understated drop cap. */
+.tpl-medium-classic .reading-title { font-family: var(--font-merriweather); font-weight: 700; letter-spacing: -0.015em; }
+.tpl-medium-classic .reading-byline { padding-bottom: 1.25rem; border-bottom: 1px solid var(--color-border); }
+.tpl-medium-classic .prose-blog > p:first-of-type::first-letter {
+  float: left; font-family: var(--font-merriweather); font-weight: 700;
+  font-size: 3.1rem; line-height: 0.82; padding: 0.35rem 0.5rem 0 0; color: var(--color-fg);
 }
-.tpl-nyt-style .reading-title { font-family: var(--font-merriweather); font-size: 3rem; font-weight: 800; letter-spacing: -0.02em; }
-.tpl-nyt-style .reading-deck  { font-style: normal; font-weight: 500; }
-.tpl-nyt-style .reading-byline { text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.18em; }
-.tpl-nyt-style .prose-blog > p:first-of-type::first-letter { all: unset; }
 
-/* 3. newspaper-justified */
-.tpl-newspaper-justified .reading-title { font-family: "Playfair Display", Georgia, serif; font-weight: 900; font-size: 3.25rem; letter-spacing: -0.025em; }
-.tpl-newspaper-justified .reading-byline { text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.18em; }
+/* 2. nyt-style — serif headline (Cheltenham→Playfair), sans "labels" (Franklin→Inter)
+   for the kicker/byline, hairline section rules. No drop cap. */
+.tpl-nyt-style .reading-header::before {
+  content: "ESSAY"; display: block; font-family: var(--font-inter);
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.25em;
+  color: var(--color-accent); margin-bottom: 1rem;
+}
+.tpl-nyt-style { --color-accent: #326891; }
+.tpl-nyt-style .reading-title { font-family: "Playfair Display", Georgia, serif; font-size: 3rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1.08; }
+.tpl-nyt-style .reading-deck  { font-family: var(--font-inter); font-style: normal; font-weight: 500; color: var(--color-fg-muted); }
+.tpl-nyt-style .reading-byline { font-family: var(--font-inter); text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.16em; padding-top: 1rem; border-top: 1px solid var(--color-border); }
+.tpl-nyt-style .prose-blog > p:first-of-type::first-letter { all: unset; }
+.tpl-nyt-style .prose-blog h2 { font-family: "Playfair Display", Georgia, serif; font-weight: 700; }
+.tpl-nyt-style .prose-blog hr { border: 0; border-top: 1px solid var(--color-border); width: 60px; margin: 2.5rem auto; }
+
+/* 3. newspaper-justified — front-page masthead: double rule, dateline kicker,
+   justified two columns, ornamented lede. */
+.tpl-newspaper-justified .reading-header::before {
+  content: "VOL. I · NO. 1 · TODAY'S EDITION"; display: block;
+  font-family: var(--font-inter); font-size: 0.62rem; font-weight: 600;
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--color-fg-muted);
+  text-align: center; padding-bottom: 0.75rem; margin-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.tpl-newspaper-justified .reading-header { border-bottom: 4px double var(--color-fg); text-align: center; }
+.tpl-newspaper-justified .reading-topics { justify-content: center; }
+.tpl-newspaper-justified .reading-byline { justify-content: center; }
+.tpl-newspaper-justified .reading-title { font-family: "Playfair Display", Georgia, serif; font-weight: 900; font-size: 3.5rem; letter-spacing: -0.025em; line-height: 1.02; }
 .tpl-newspaper-justified .prose-blog { text-align: justify; hyphens: auto; }
-.tpl-newspaper-justified .reading-header { border-bottom: 3px double var(--color-border); }
+.tpl-newspaper-justified .prose-blog > p:first-of-type::first-letter {
+  float: left; font-family: "Playfair Display", Georgia, serif; font-weight: 900;
+  font-size: 3.6rem; line-height: 0.74; padding: 0.4rem 0.55rem 0 0;
+}
 @media (min-width: 900px) {
-  .tpl-newspaper-justified .prose-blog { column-count: 2; column-gap: 2.5rem; }
+  .tpl-newspaper-justified .prose-blog { column-count: 2; column-gap: 2.5rem; column-rule: 1px solid var(--color-border); }
   .tpl-newspaper-justified .prose-blog > h2,
   .tpl-newspaper-justified .prose-blog > h3,
   .tpl-newspaper-justified .prose-blog > img,
@@ -44,182 +71,256 @@
   .tpl-newspaper-justified .prose-blog > blockquote { column-span: all; }
 }
 
-/* 4. vogue-editorial */
-.tpl-vogue-editorial { --color-surface: #ffffff; --color-fg: #0a0a0a; --color-accent: #b8860b; }
+/* 4. vogue-editorial — Didone high fashion: hairline-contrast Playfair, gold,
+   oversized italic deck, big gold drop cap, letterspaced caps subheads. */
+.tpl-vogue-editorial { --color-surface: #ffffff; --color-fg: #0a0a0a; --color-accent: #b8860b; --color-border: #e8e0cf; }
+.tpl-vogue-editorial .reading-header { text-align: center; }
+.tpl-vogue-editorial .reading-topics { justify-content: center; }
+.tpl-vogue-editorial .reading-byline { justify-content: center; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.22em; }
 .tpl-vogue-editorial .reading-title { font-family: "Playfair Display", Georgia, serif; font-weight: 900; font-size: 4.5rem; text-transform: none; letter-spacing: -0.03em; line-height: 1.02; }
-.tpl-vogue-editorial .reading-deck  { font-family: "Playfair Display", Georgia, serif; font-style: italic; font-size: 1.5rem; }
-.tpl-vogue-editorial .prose-blog h2 { text-transform: uppercase; letter-spacing: 0.18em; font-size: 1rem; font-weight: 700; margin-top: 3rem; }
-.tpl-vogue-editorial .prose-blog > p:first-of-type::first-letter { font-size: 5rem; color: #b8860b; }
-.tpl-vogue-editorial .reading-byline { text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.22em; }
+.tpl-vogue-editorial .reading-deck  { font-family: "Playfair Display", Georgia, serif; font-style: italic; font-size: 1.5rem; color: var(--color-fg-muted); }
+.tpl-vogue-editorial .prose-blog h2 { text-transform: uppercase; letter-spacing: 0.2em; font-size: 1rem; font-weight: 700; margin-top: 3rem; text-align: center; }
+.tpl-vogue-editorial .prose-blog h2::after { content: ""; display: block; width: 40px; height: 1px; background: var(--color-accent); margin: 0.75rem auto 0; }
+.tpl-vogue-editorial .prose-blog > p:first-of-type::first-letter {
+  float: left; font-family: "Playfair Display", Georgia, serif;
+  font-size: 5rem; line-height: 0.72; padding: 0.35rem 0.5rem 0 0; color: #b8860b;
+}
 
-/* 5. monocle-modern */
+/* 5. monocle-modern — briefing-room precision: clean grotesk, oxblood red,
+   structured numbered subheads, kicker label. */
 .tpl-monocle-modern { --color-surface: #fafaf7; --color-fg: #181818; --color-accent: #c8102e; }
-.tpl-monocle-modern .reading-title { font-family: var(--font-inter); font-weight: 700; font-size: 2.5rem; letter-spacing: -0.015em; }
+.tpl-monocle-modern .reading-header::before {
+  content: "THE BRIEFING"; display: block; font-family: "Space Grotesk", var(--font-inter), sans-serif;
+  font-size: 0.66rem; font-weight: 700; letter-spacing: 0.2em; color: var(--color-accent); margin-bottom: 0.85rem;
+}
+.tpl-monocle-modern .reading-title { font-family: "Space Grotesk", var(--font-inter), sans-serif; font-weight: 700; font-size: 2.6rem; letter-spacing: -0.02em; }
 .tpl-monocle-modern .reading-deck { font-family: var(--font-inter); font-weight: 400; font-style: italic; }
+.tpl-monocle-modern .reading-byline { font-family: var(--font-inter); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.14em; }
 .tpl-monocle-modern .prose-blog { font-family: var(--font-inter); font-size: 1.0625rem; }
 .tpl-monocle-modern .prose-blog > p:first-of-type::first-letter { all: unset; }
-.tpl-monocle-modern .reading-byline { text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.14em; }
+.tpl-monocle-modern .prose-blog h2 { font-family: "Space Grotesk", var(--font-inter), sans-serif; border-left: 3px solid var(--color-accent); padding-left: 0.75rem; }
 
-/* 6. kinfolk */
+/* 6. kinfolk — whitespace as the subject: vast margins, airy light Fraunces,
+   centered hairline letterspaced caps subheads, muted earth palette. */
 .tpl-kinfolk {
-  --color-surface: #f5f1e8;
-  --color-surface-raised: #fffcf4;
-  --color-surface-sunken: #ece6d6;
-  --color-border: #d6cdb6;
-  --color-fg: #3d2914;
-  --color-fg-muted: #6b5a3f;
-  --color-accent: #8b6f47;
-  --color-accent-soft: rgba(139, 111, 71, 0.10);
+  --color-surface: #f5f1e8; --color-surface-raised: #fffcf4; --color-surface-sunken: #ece6d6;
+  --color-border: #d6cdb6; --color-fg: #3d2914; --color-fg-muted: #6b5a3f;
+  --color-accent: #8b6f47; --color-accent-soft: rgba(139, 111, 71, 0.10);
 }
-.tpl-kinfolk .reading-title { font-family: var(--font-merriweather); font-weight: 300; font-size: 3.5rem; letter-spacing: -0.01em; }
-.tpl-kinfolk .reading-deck { font-style: italic; font-weight: 300; }
-.tpl-kinfolk .reading-container { padding: 5rem 1.5rem 3rem; }
-.tpl-kinfolk .prose-blog { font-weight: 300; }
+.tpl-kinfolk .reading-container { max-width: 40rem; padding: 6rem 1.5rem 4rem; }
+.tpl-kinfolk .reading-header { text-align: center; }
+.tpl-kinfolk .reading-topics { justify-content: center; }
+.tpl-kinfolk .reading-byline { justify-content: center; letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.7rem; }
+.tpl-kinfolk .reading-title { font-family: "Fraunces", Georgia, serif; font-weight: 300; font-size: 3.5rem; letter-spacing: 0.01em; line-height: 1.15; }
+.tpl-kinfolk .reading-deck { font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 300; }
+.tpl-kinfolk .prose-blog { font-weight: 300; line-height: 1.95; }
+.tpl-kinfolk .prose-blog > p:first-of-type::first-letter { all: unset; }
+.tpl-kinfolk .prose-blog h2 { text-align: center; text-transform: uppercase; letter-spacing: 0.28em; font-size: 0.85rem; font-weight: 500; margin-top: 3.5rem; color: var(--color-fg-muted); }
 
-/* 7. paris-review */
-.tpl-paris-review .reading-header { text-align: center; }
+/* 7. paris-review — literary quarterly: centered italic Fraunces, ❦ breaks,
+   small-caps byline, generous leading. */
+.tpl-paris-review .reading-header { text-align: center; border-bottom: 3px double var(--color-border); }
 .tpl-paris-review .reading-topics { justify-content: center; }
-.tpl-paris-review .reading-title { font-family: var(--font-merriweather); font-style: italic; font-size: 3rem; }
-.tpl-paris-review .reading-deck  { text-align: center; }
-.tpl-paris-review .reading-byline { justify-content: center; }
-.tpl-paris-review .reading-header { border-bottom: 3px double var(--color-border); }
+.tpl-paris-review .reading-title { font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 400; font-size: 3rem; }
+.tpl-paris-review .reading-deck  { text-align: center; font-family: "Fraunces", Georgia, serif; font-style: italic; }
+.tpl-paris-review .reading-byline { justify-content: center; font-variant: small-caps; letter-spacing: 0.08em; }
+.tpl-paris-review .prose-blog { line-height: 1.9; }
 .tpl-paris-review .prose-blog hr { border: 0; text-align: center; }
-.tpl-paris-review .prose-blog hr::after { content: "❦"; color: var(--color-fg-subtle); font-size: 1.25rem; }
+.tpl-paris-review .prose-blog hr::after { content: "❦"; color: var(--color-accent); font-size: 1.25rem; }
 
-/* 8. atlantic */
+/* 8. atlantic — bold serif headline, sans deck, crimson accent, italic hierarchy,
+   strong bold drop cap. */
 .tpl-atlantic { --color-surface: #ffffff; --color-fg: #111111; --color-accent: #c8102e; }
-.tpl-atlantic .reading-title { font-family: var(--font-merriweather); font-weight: 800; font-size: 3.5rem; letter-spacing: -0.025em; }
-.tpl-atlantic .reading-deck { font-family: var(--font-inter); font-style: normal; font-weight: 400; color: var(--color-fg-muted); }
+.tpl-atlantic .reading-title { font-family: "Playfair Display", Georgia, serif; font-weight: 800; font-size: 3.4rem; letter-spacing: -0.025em; line-height: 1.04; }
+.tpl-atlantic .reading-deck { font-family: var(--font-inter); font-style: italic; font-weight: 400; color: var(--color-fg-muted); }
 .tpl-atlantic .reading-byline { font-family: var(--font-inter); }
-.tpl-atlantic .prose-blog > p:first-of-type::first-letter { font-weight: 800; }
+.tpl-atlantic .prose-blog > p:first-of-type::first-letter { float: left; font-family: "Playfair Display", Georgia, serif; font-weight: 800; font-size: 3.4rem; line-height: 0.8; padding: 0.3rem 0.5rem 0 0; color: var(--color-accent); }
+.tpl-atlantic .prose-blog h2 { font-family: "Playfair Display", Georgia, serif; font-weight: 700; }
+.tpl-atlantic .prose-blog blockquote { border-left: 3px solid var(--color-accent); font-style: italic; font-family: "Playfair Display", Georgia, serif; }
 
-/* 9. atlantic-dark */
+/* 9. atlantic-dark — the same editorial bones on near-black with a luminous coral. */
 .tpl-atlantic-dark {
   --color-surface: #0c0c0c; --color-surface-raised: #161616; --color-surface-sunken: #1f1f1f;
   --color-border: #2a2a2a; --color-fg: #f5f5f5; --color-fg-muted: #b3b3b3; --color-fg-subtle: #808080;
   --color-accent: #ff6b6b; --color-accent-soft: rgba(255, 107, 107, 0.12);
 }
-.tpl-atlantic-dark .reading-title { font-family: var(--font-merriweather); font-weight: 800; font-size: 3.5rem; letter-spacing: -0.025em; }
-.tpl-atlantic-dark .reading-deck { font-family: var(--font-inter); font-weight: 400; }
+.tpl-atlantic-dark .reading-title { font-family: "Playfair Display", Georgia, serif; font-weight: 800; font-size: 3.4rem; letter-spacing: -0.025em; line-height: 1.04; }
+.tpl-atlantic-dark .reading-deck { font-family: var(--font-inter); font-style: italic; font-weight: 400; }
+.tpl-atlantic-dark .prose-blog > p:first-of-type::first-letter { float: left; font-family: "Playfair Display", Georgia, serif; font-weight: 800; font-size: 3.4rem; line-height: 0.8; padding: 0.3rem 0.5rem 0 0; color: var(--color-accent); }
+.tpl-atlantic-dark .prose-blog blockquote { border-left: 3px solid var(--color-accent); font-style: italic; }
 
-/* 10. literary-review */
+/* 10. literary-review — book-review intimacy: narrow measure, light Fraunces,
+   italic deck, footnote small-caps subheads. */
 .tpl-literary-review { --color-surface: #f8f3e3; --color-fg: #2b1d0e; --color-accent: #7a4a1b; --color-border: #d9cfb0; }
-.tpl-literary-review .reading-container { max-width: 36rem; padding: 4rem 1.5rem 3rem; }
-.tpl-literary-review .reading-title { font-family: var(--font-merriweather); font-weight: 300; font-size: 2.75rem; line-height: 1.15; }
-.tpl-literary-review .reading-deck { font-style: italic; font-weight: 300; }
-.tpl-literary-review .prose-blog { font-size: 1.0625rem; line-height: 1.85; }
+.tpl-literary-review .reading-container { max-width: 34rem; padding: 4rem 1.5rem 3rem; }
+.tpl-literary-review .reading-title { font-family: "Fraunces", Georgia, serif; font-weight: 300; font-size: 2.75rem; line-height: 1.15; letter-spacing: -0.01em; }
+.tpl-literary-review .reading-deck { font-family: "Fraunces", Georgia, serif; font-style: italic; font-weight: 300; }
+.tpl-literary-review .prose-blog { font-family: "Fraunces", Georgia, serif; font-size: 1.0625rem; line-height: 1.9; }
+.tpl-literary-review .prose-blog > p:first-of-type::first-letter { all: unset; }
+.tpl-literary-review .prose-blog h2 { font-variant: small-caps; letter-spacing: 0.06em; font-weight: 400; font-size: 1.4rem; }
 
 
 /* ════════════════════════════════════════════════════════════════════════════
    Family 2 — Minimal (8)
    ════════════════════════════════════════════════════════════════════════════ */
 
-/* 11. ghost-publication */
+/* 11. ghost-publication — centered essay, sans display headline, Source Serif body. */
 .tpl-ghost-publication { --color-surface: #ffffff; --color-fg: #15171a; --color-accent: #15171a; }
 .tpl-ghost-publication .reading-header { text-align: center; }
 .tpl-ghost-publication .reading-topics { justify-content: center; }
 .tpl-ghost-publication .reading-byline { justify-content: center; }
-.tpl-ghost-publication .reading-title { font-family: var(--font-inter); font-weight: 800; font-size: 3.25rem; letter-spacing: -0.025em; }
-.tpl-ghost-publication .reading-deck { font-family: var(--font-inter); font-weight: 300; font-style: normal; }
-.tpl-ghost-publication .prose-blog { font-family: "Source Serif Pro", Georgia, serif; }
+.tpl-ghost-publication .reading-title { font-family: var(--font-inter); font-weight: 800; font-size: 3.25rem; letter-spacing: -0.03em; line-height: 1.08; }
+.tpl-ghost-publication .reading-deck { font-family: var(--font-inter); font-weight: 300; font-style: normal; font-size: 1.3rem; }
+.tpl-ghost-publication .prose-blog { font-family: "Source Serif 4", Georgia, serif; font-size: 1.18rem; line-height: 1.8; }
 .tpl-ghost-publication .prose-blog > p:first-of-type::first-letter { all: unset; }
 
-/* 12. paper-pure */
+/* 12. paper-pure — pure monochrome reduction: thin black/white, hairline rules,
+   tiny mono caption accent, no color. */
 .tpl-paper-pure { --color-surface: #ffffff; --color-fg: #0a0a0a; --color-border: #e5e5e5; --color-accent: #0a0a0a; }
 .tpl-paper-pure .reading-title { font-family: var(--font-merriweather); font-weight: 700; font-size: 2.75rem; }
+.tpl-paper-pure .reading-byline { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.02em; padding-bottom: 1rem; border-bottom: 1px solid var(--color-fg); }
+.tpl-paper-pure .reading-deck { color: var(--color-fg-muted); }
 .tpl-paper-pure .prose-blog > p:first-of-type::first-letter { all: unset; }
+.tpl-paper-pure .prose-blog h2 { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.06em; }
 .tpl-paper-pure .reading-cover::after { background: linear-gradient(to top, #fff 0%, transparent 50%); }
 
-/* 13. swiss-grid */
-.tpl-swiss-grid { --color-surface: #ffffff; --color-fg: #000000; --color-accent: #ff0000; --color-border: #000000; }
-.tpl-swiss-grid .reading-title { font-family: "Helvetica Neue", Inter, sans-serif; font-weight: 700; font-size: 3rem; letter-spacing: -0.02em; }
-.tpl-swiss-grid .reading-deck { font-family: Inter, sans-serif; font-style: normal; }
-.tpl-swiss-grid .reading-header { border-bottom: 2px solid #000; }
+/* 13. swiss-grid — International Typographic Style: grotesk, flush-left rag-right,
+   red markers, uppercase numbered subheads, baseline rules, NO drop cap. */
+.tpl-swiss-grid { --color-surface: #ffffff; --color-fg: #000000; --color-accent: #e30613; --color-border: #000000; }
+.tpl-swiss-grid .reading-header { border-bottom: 3px solid #000; padding-bottom: 1rem; }
+.tpl-swiss-grid .reading-header::before {
+  content: "01"; display: block; font-family: "Space Grotesk", "Helvetica Neue", sans-serif;
+  font-weight: 700; font-size: 2rem; color: var(--color-accent); line-height: 1; margin-bottom: 0.5rem;
+}
+.tpl-swiss-grid .reading-title { font-family: "Space Grotesk", "Helvetica Neue", Inter, sans-serif; font-weight: 700; font-size: 3rem; letter-spacing: -0.03em; line-height: 1.0; }
+.tpl-swiss-grid .reading-deck { font-family: "Space Grotesk", Inter, sans-serif; font-style: normal; font-weight: 400; }
+.tpl-swiss-grid .reading-byline { font-family: "Space Grotesk", Inter, sans-serif; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.72rem; }
 .tpl-swiss-grid .topic-pill { border-radius: 0; background: transparent; color: #000; border: 1px solid #000; }
+.tpl-swiss-grid .prose-blog { font-family: "Space Grotesk", Inter, sans-serif; }
 .tpl-swiss-grid .prose-blog > p:first-of-type::first-letter { all: unset; }
-.tpl-swiss-grid .prose-blog h2 { text-transform: uppercase; letter-spacing: 0.05em; }
+.tpl-swiss-grid .prose-blog h2 { text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; border-top: 2px solid #000; padding-top: 0.5rem; }
+.tpl-swiss-grid .prose-blog h2::before { content: "→ "; color: var(--color-accent); }
 
-/* 14. notion-clean */
+/* 14. notion-clean — friendly workspace: Inter, blue accent, callout blockquotes,
+   soft rounded surfaces. */
 .tpl-notion-clean { --color-surface: #fbfbfa; --color-fg: #37352f; --color-accent: #2383e2; --color-border: #e9e7e1; }
 .tpl-notion-clean .reading-title { font-family: var(--font-inter); font-weight: 700; font-size: 3rem; letter-spacing: -0.02em; }
-.tpl-notion-clean .reading-deck { font-family: var(--font-inter); font-style: normal; font-weight: 400; }
+.tpl-notion-clean .reading-deck { font-family: var(--font-inter); font-style: normal; font-weight: 400; color: var(--color-fg-muted); }
 .tpl-notion-clean .prose-blog { font-family: var(--font-inter); font-size: 1.0625rem; }
 .tpl-notion-clean .prose-blog > p:first-of-type::first-letter { all: unset; }
+.tpl-notion-clean .prose-blog blockquote {
+  background: rgba(35, 131, 226, 0.07); border-left: 4px solid var(--color-accent);
+  border-radius: 0.5rem; padding: 0.85rem 1rem; font-style: normal;
+}
+.tpl-notion-clean .prose-blog blockquote::before { content: "💡 "; }
 .tpl-notion-clean .card-hover, .tpl-notion-clean .blog-card { border-radius: 0.5rem; }
 
-/* 15. vellum */
-.tpl-vellum { --color-surface: #faf6ed; --color-fg: #2a2418; --color-border: #e3dcc6; --color-accent: #b58900; }
-.tpl-vellum .reading-title { font-family: var(--font-merriweather); font-weight: 700; }
-.tpl-vellum .reading-deck { font-style: italic; }
-.tpl-vellum .prose-blog a { text-decoration-style: wavy; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+/* 15. vellum — illuminated parchment: warm Fraunces, ornate floated initial,
+   faint vertical margin rule. */
+.tpl-vellum { --color-surface: #faf6ed; --color-surface-raised: #fffdf5; --color-fg: #2a2418; --color-border: #e3dcc6; --color-accent: #b58900; }
+.tpl-vellum .reading-title { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 2.9rem; letter-spacing: -0.01em; }
+.tpl-vellum .reading-deck { font-family: "Fraunces", Georgia, serif; font-style: italic; }
+.tpl-vellum .prose-blog > p:first-of-type::first-letter {
+  float: left; font-family: "Fraunces", Georgia, serif; font-weight: 600;
+  font-size: 4.2rem; line-height: 0.7; padding: 0.4rem 0.6rem 0 0;
+  color: var(--color-accent);
+}
+.tpl-vellum .prose-blog { border-left: 1px solid var(--color-border); padding-left: 1.5rem; }
+.tpl-vellum .prose-blog a { color: var(--color-accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
 
-/* 16. linen */
-.tpl-linen { --color-surface: #f3eddc; --color-surface-raised: #fbf6e6; --color-fg: #2e2618; --color-border: #d8cfb3; --color-accent: #8a6d3b; }
-.tpl-linen .reading-title { font-family: var(--font-merriweather); font-weight: 700; font-size: 2.75rem; }
+/* 16. linen — woven textile: heavier serif, hairline woven borders, no drop cap,
+   linen-tone palette distinct from vellum's parchment gold. */
+.tpl-linen { --color-surface: #ece5d3; --color-surface-raised: #f7f1e1; --color-fg: #33291a; --color-border: #cabf9f; --color-accent: #6f5630; }
+.tpl-linen .reading-header { border-bottom: 1px solid var(--color-border); box-shadow: 0 1px 0 var(--color-border); padding-bottom: 1.25rem; }
+.tpl-linen .reading-title { font-family: var(--font-merriweather); font-weight: 700; font-size: 2.75rem; letter-spacing: -0.01em; }
+.tpl-linen .reading-deck { color: var(--color-fg-muted); }
 .tpl-linen .prose-blog > p:first-of-type::first-letter { all: unset; }
+.tpl-linen .prose-blog h2 { border-bottom: 1px solid var(--color-border); padding-bottom: 0.3rem; }
+.tpl-linen .topic-pill { background: var(--color-surface-raised); border: 1px solid var(--color-border); color: var(--color-accent); }
 
-/* 17. fog */
+/* 17. fog — low-contrast cool grey calm: soft inter, misty gradient header, airy. */
 .tpl-fog { --color-surface: #f4f5f7; --color-surface-raised: #ffffff; --color-fg: #3a3f47; --color-fg-muted: #6b727b; --color-border: #d9dde2; --color-accent: #5b6878; }
+.tpl-fog .reading-header { background: linear-gradient(180deg, #e4e8ee 0%, transparent 100%); margin: 0 auto; padding: 2.5rem 1.5rem 1.5rem; border-radius: 1rem 1rem 0 0; }
 .tpl-fog .reading-title { font-family: var(--font-inter); font-weight: 600; font-size: 2.75rem; letter-spacing: -0.02em; }
-.tpl-fog .reading-deck { font-style: normal; font-family: var(--font-inter); }
+.tpl-fog .reading-deck { font-style: normal; font-family: var(--font-inter); font-weight: 300; }
+.tpl-fog .prose-blog { line-height: 1.9; }
 .tpl-fog .prose-blog > p:first-of-type::first-letter { all: unset; }
+.tpl-fog .prose-blog h2 { font-weight: 500; color: var(--color-fg-muted); }
 
-/* 18. dawn */
+/* 18. dawn — sunrise warmth: glowing gradient header, warm inter. */
 .tpl-dawn { --color-surface: #fff5ec; --color-surface-raised: #ffffff; --color-fg: #3d1f0a; --color-fg-muted: #7a5236; --color-border: #f5d9b8; --color-accent: #e8825a; }
 .tpl-dawn .reading-cover::after { background: linear-gradient(to top, #fff5ec 0%, transparent 60%); }
-.tpl-dawn .reading-header { background: linear-gradient(180deg, #ffd9b8 0%, #fff5ec 100%); margin: 0 -1.5rem; padding: 2.5rem 1.5rem; border-radius: 1.25rem; }
-.tpl-dawn .reading-title { font-family: var(--font-inter); font-weight: 800; }
+.tpl-dawn .reading-header { background: linear-gradient(180deg, #ffd9b8 0%, #fff5ec 100%); margin: 0 auto; padding: 3rem 1.5rem 2rem; border-radius: 1.25rem; }
+.tpl-dawn .reading-title { font-family: var(--font-inter); font-weight: 800; letter-spacing: -0.02em; }
+.tpl-dawn .reading-deck { color: var(--color-fg-muted); }
+.tpl-dawn .topic-pill { background: rgba(232, 130, 90, 0.15); border-color: var(--color-accent); color: var(--color-accent); }
 
 
 /* ════════════════════════════════════════════════════════════════════════════
    Family 3 — Bold / Display (6)
    ════════════════════════════════════════════════════════════════════════════ */
 
-/* 19. brutalist */
+/* 19. brutalist — raw concrete: everything mono, exposed white borders on black,
+   neon-green accents, comment-marker subheads, zero rounding. */
 .tpl-brutalist {
   --color-surface: #000000; --color-surface-raised: #000; --color-surface-sunken: #0a0a0a;
   --color-fg: #ffffff; --color-fg-muted: #888; --color-fg-subtle: #555;
   --color-accent: #00ff66; --color-accent-soft: rgba(0, 255, 102, 0.10);
   --color-border: #ffffff;
 }
-.tpl-brutalist .reading-title { font-family: ui-monospace, "JetBrains Mono", monospace; text-transform: uppercase; font-weight: 700; font-size: 2.5rem; letter-spacing: 0; line-height: 1.1; }
-.tpl-brutalist .reading-deck { font-family: ui-monospace, monospace; font-style: normal; }
-.tpl-brutalist .reading-byline { font-family: ui-monospace, monospace; }
-.tpl-brutalist .prose-blog { font-family: ui-monospace, monospace; }
+.tpl-brutalist .reading-header { border-bottom: 2px solid #fff; padding-bottom: 1rem; }
+.tpl-brutalist .reading-header::before { content: "// FILED UNDER LOG"; display: block; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.7rem; color: var(--color-accent); margin-bottom: 0.75rem; }
+.tpl-brutalist .reading-title { font-family: "JetBrains Mono", ui-monospace, monospace; text-transform: uppercase; font-weight: 700; font-size: 2.5rem; letter-spacing: 0; line-height: 1.1; }
+.tpl-brutalist .reading-deck { font-family: "JetBrains Mono", ui-monospace, monospace; font-style: normal; }
+.tpl-brutalist .reading-byline { font-family: "JetBrains Mono", ui-monospace, monospace; }
+.tpl-brutalist .prose-blog { font-family: "JetBrains Mono", ui-monospace, monospace; }
 .tpl-brutalist .prose-blog > p:first-of-type::first-letter { all: unset; }
+.tpl-brutalist .prose-blog h2::before { content: "/* "; color: var(--color-accent); }
+.tpl-brutalist .prose-blog h2::after { content: " */"; color: var(--color-accent); }
 .tpl-brutalist .topic-pill { border-radius: 0; background: #00ff66; color: #000; border: 0; }
 .tpl-brutalist .blog-card, .tpl-brutalist .card-hover, .tpl-brutalist .author-card { border-radius: 0; border-width: 2px; }
 .tpl-brutalist .share-btn { border-radius: 0; }
 
-/* 20. neobrutalist */
+/* 20. neobrutalist — playful & loud: chunky offset hard shadows, thick black
+   borders, sticker-highlight subheads, saturated colour. */
 .tpl-neobrutalist { --color-surface: #fef3c7; --color-surface-raised: #ffffff; --color-fg: #111; --color-accent: #f43f5e; --color-border: #111; }
-.tpl-neobrutalist .reading-title { font-family: var(--font-inter); font-weight: 900; font-size: 3.5rem; letter-spacing: -0.03em; }
-.tpl-neobrutalist .reading-header { border-bottom: 4px solid #111; }
+.tpl-neobrutalist .reading-header { border: 3px solid #111; box-shadow: 8px 8px 0 #111; background: #fff; margin: 0 auto 1.5rem; padding: 1.5rem 1.25rem; border-radius: 0.75rem; }
+.tpl-neobrutalist .reading-title { font-family: var(--font-inter); font-weight: 900; font-size: 3.5rem; letter-spacing: -0.03em; line-height: 1.02; }
 .tpl-neobrutalist .topic-pill { background: #fbbf24; color: #111; border: 2px solid #111; box-shadow: 3px 3px 0 #111; border-radius: 0.5rem; }
+.tpl-neobrutalist .prose-blog h2 { display: inline-block; background: #38bdf8; color: #111; border: 2px solid #111; box-shadow: 4px 4px 0 #111; padding: 0.15rem 0.6rem; border-radius: 0.4rem; }
+.tpl-neobrutalist .prose-blog > p:first-of-type::first-letter { all: unset; }
 .tpl-neobrutalist .blog-card, .tpl-neobrutalist .card-hover, .tpl-neobrutalist .author-card { border-width: 3px; border-color: #111; box-shadow: 6px 6px 0 #111; border-radius: 0.75rem; }
 .tpl-neobrutalist .btn-primary { background: #f43f5e; border: 2px solid #111; box-shadow: 4px 4px 0 #111; }
 
-/* 21. manifesto */
+/* 21. manifesto — declaration: monumental Space Grotesk, numbered statements,
+   stark black-on-white, ultra-tight measure. */
 .tpl-manifesto { --color-surface: #ffffff; --color-fg: #000; --color-accent: #000; }
 .tpl-manifesto .reading-container { max-width: 38rem; }
-.tpl-manifesto .reading-title { font-family: var(--font-inter); font-weight: 900; font-size: 5rem; line-height: 0.95; letter-spacing: -0.045em; }
+.tpl-manifesto .reading-title { font-family: "Space Grotesk", var(--font-inter), sans-serif; font-weight: 700; font-size: 5rem; line-height: 0.92; letter-spacing: -0.045em; }
 @media (min-width: 768px) { .tpl-manifesto .reading-title { font-size: 7rem; } }
-.tpl-manifesto .reading-deck { font-size: 1.5rem; font-style: normal; font-weight: 500; }
+.tpl-manifesto .reading-deck { font-family: "Space Grotesk", var(--font-inter), sans-serif; font-size: 1.5rem; font-style: normal; font-weight: 500; }
 .tpl-manifesto .prose-blog > p:first-of-type::first-letter { all: unset; }
+.tpl-manifesto .prose-blog { counter-reset: manifesto; }
+.tpl-manifesto .prose-blog h2 { font-family: "Space Grotesk", var(--font-inter), sans-serif; font-weight: 700; }
+.tpl-manifesto .prose-blog h2::before { counter-increment: manifesto; content: counter(manifesto, decimal-leading-zero) ". "; }
 
-/* 22. cyberpunk */
+/* 22. cyberpunk — neon terminal: glowing mono title, cyan/magenta, scanline header,
+   glowing links. */
 .tpl-cyberpunk {
   --color-surface: #06060a; --color-surface-raised: #0d0d18; --color-surface-sunken: #14141f;
   --color-fg: #f0f6ff; --color-fg-muted: #8a93b0; --color-fg-subtle: #5a627a;
   --color-border: #2a304a; --color-accent: #00e5ff; --color-accent-soft: rgba(0, 229, 255, 0.10);
 }
-.tpl-cyberpunk .reading-title { font-family: ui-monospace, "JetBrains Mono", monospace; font-weight: 700; color: #00e5ff; text-shadow: 0 0 18px rgba(0, 229, 255, 0.4); }
-.tpl-cyberpunk .reading-deck { font-family: ui-monospace, monospace; color: #ff2ec4; }
-.tpl-cyberpunk .reading-byline { font-family: ui-monospace, monospace; }
-.tpl-cyberpunk .topic-pill { border-color: #00e5ff; color: #00e5ff; background: transparent; }
-.tpl-cyberpunk .prose-blog a { color: #ff2ec4; }
+.tpl-cyberpunk .reading-header { position: relative; background-image: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0, 229, 255, 0.04) 3px, rgba(0, 229, 255, 0.04) 4px); padding: 1.5rem 0; }
+.tpl-cyberpunk .reading-header::before { content: "> RUNNING //_"; display: block; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.7rem; color: #ff2ec4; margin-bottom: 0.75rem; }
+.tpl-cyberpunk .reading-title { font-family: "JetBrains Mono", ui-monospace, monospace; font-weight: 700; color: #00e5ff; text-shadow: 0 0 18px rgba(0, 229, 255, 0.45); }
+.tpl-cyberpunk .reading-deck { font-family: "JetBrains Mono", ui-monospace, monospace; color: #ff2ec4; }
+.tpl-cyberpunk .reading-byline { font-family: "JetBrains Mono", ui-monospace, monospace; }
+.tpl-cyberpunk .topic-pill { border-color: #00e5ff; color: #00e5ff; background: transparent; border-radius: 0; }
+.tpl-cyberpunk .prose-blog a { color: #ff2ec4; text-shadow: 0 0 8px rgba(255, 46, 196, 0.5); }
+.tpl-cyberpunk .prose-blog h2 { color: #00e5ff; text-shadow: 0 0 12px rgba(0, 229, 255, 0.35); }
 
-/* 23. synthwave */
+/* 23. synthwave — retro outrun: gradient sunset title, neon grid header glow. */
 .tpl-synthwave {
   --color-surface: #1a0033; --color-surface-raised: #2a0a4a; --color-surface-sunken: #150028;
   --color-fg: #f4e6ff; --color-fg-muted: #c8a8e8; --color-fg-subtle: #8868a8;
@@ -227,74 +328,111 @@
 }
 .tpl-synthwave .reading-cover::after { background: linear-gradient(to top, #1a0033 0%, rgba(255, 121, 198, 0.20) 50%, transparent 100%); }
 .tpl-synthwave .reading-title { font-family: var(--font-inter); font-weight: 800; background: linear-gradient(135deg, #ff79c6, #50fa7b); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.tpl-synthwave .reading-header { background: linear-gradient(180deg, rgba(255, 121, 198, 0.15) 0%, transparent 100%); border-radius: 1.5rem; padding: 2rem 1.5rem; }
+.tpl-synthwave .reading-header {
+  background:
+    linear-gradient(180deg, rgba(255, 121, 198, 0.18) 0%, transparent 100%),
+    repeating-linear-gradient(90deg, transparent, transparent 28px, rgba(80, 250, 123, 0.12) 28px, rgba(80, 250, 123, 0.12) 29px);
+  border-radius: 1.5rem; padding: 2.25rem 1.5rem; border-bottom: 2px solid #ff79c6;
+}
+.tpl-synthwave .topic-pill { border-color: #ff79c6; color: #ff79c6; background: rgba(255, 121, 198, 0.08); }
+.tpl-synthwave .prose-blog a { color: #50fa7b; }
 
-/* 24. zine */
+/* 24. zine — DIY photocopy cut-and-paste: rotated ransom type, highlighter heads,
+   taped cover, grainy texture. */
 .tpl-zine { --color-surface: #fffbea; --color-fg: #1a1a1a; --color-accent: #e11d48; --color-border: #1a1a1a; }
-.tpl-zine .reading-title { font-family: ui-monospace, monospace; font-weight: 700; font-size: 3rem; transform: rotate(-1deg); }
-.tpl-zine .reading-deck { font-family: ui-monospace, monospace; transform: rotate(0.5deg); }
+.tpl-zine .reading-header { position: relative; }
+.tpl-zine .reading-header::before {
+  content: "CUT · PASTE · PHOTOCOPY"; display: inline-block; transform: rotate(1.5deg);
+  font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.7rem; font-weight: 700;
+  background: #1a1a1a; color: #fffbea; padding: 0.15rem 0.5rem; margin-bottom: 0.75rem;
+}
+.tpl-zine .reading-title { font-family: "JetBrains Mono", ui-monospace, monospace; font-weight: 700; font-size: 3rem; transform: rotate(-1deg); }
+.tpl-zine .reading-deck { font-family: "JetBrains Mono", ui-monospace, monospace; transform: rotate(0.5deg); }
 .tpl-zine .topic-pill { transform: rotate(-2deg); border: 2px solid #1a1a1a; border-radius: 0; background: #fbbf24; color: #1a1a1a; }
-.tpl-zine .reading-cover { transform: rotate(-1deg); margin: 1rem; border: 3px solid #1a1a1a; }
-.tpl-zine .prose-blog h2 { background: #fef08a; padding: 0.25rem 0.5rem; display: inline-block; transform: rotate(-0.5deg); }
+.tpl-zine .reading-cover { transform: rotate(-1deg); margin: 1rem; border: 3px solid #1a1a1a; box-shadow: 5px 5px 0 #1a1a1a; }
+.tpl-zine .prose-blog h2 { background: #fef08a; padding: 0.25rem 0.5rem; display: inline-block; transform: rotate(-0.5deg); box-shadow: 3px 3px 0 #1a1a1a; }
+.tpl-zine .prose-blog > p:first-of-type::first-letter { all: unset; }
 
 
 /* ════════════════════════════════════════════════════════════════════════════
    Family 4 — Personal / Warm (3)
    ════════════════════════════════════════════════════════════════════════════ */
 
-/* 25. journal */
+/* 25. journal — handwritten diary: Caveat throughout, ruled-paper background,
+   doodle underline accents. */
 .tpl-journal { --color-surface: #fbf4e4; --color-surface-raised: #fff9eb; --color-fg: #2c1e0c; --color-accent: #b45309; --color-border: #d6c79b; }
 .tpl-journal .reading-title { font-family: "Caveat", "Comic Sans MS", cursive; font-weight: 700; font-size: 4rem; line-height: 1.05; color: #4a3318; }
-.tpl-journal .reading-deck { font-family: "Caveat", cursive; font-size: 1.5rem; font-style: normal; }
-.tpl-journal .reading-byline { font-family: "Caveat", cursive; font-size: 1.125rem; }
+.tpl-journal .reading-deck { font-family: "Caveat", cursive; font-size: 1.6rem; font-style: normal; }
+.tpl-journal .reading-byline { font-family: "Caveat", cursive; font-size: 1.2rem; }
 .tpl-journal .prose-blog > p:first-of-type::first-letter { all: unset; }
 .tpl-journal .reading-container { background: repeating-linear-gradient(transparent, transparent 1.7rem, rgba(74, 51, 24, 0.08) 1.7rem, rgba(74, 51, 24, 0.08) 1.75rem); }
+.tpl-journal .prose-blog h2 { font-family: "Caveat", cursive; font-size: 2rem; color: var(--color-accent); }
+.tpl-journal .prose-blog a { text-decoration: none; background-image: linear-gradient(transparent 60%, rgba(180, 83, 9, 0.3) 0); }
 
-/* 26. letter */
+/* 26. letter — personal correspondence: italic serif, "Dear reader," opener,
+   right-aligned dateline, sign-off rule. */
 .tpl-letter { --color-surface: #faf6ec; --color-surface-raised: #fffdf3; --color-fg: #2a2418; --color-accent: #7a4a1b; --color-border: #d9cfb0; }
 .tpl-letter .reading-container { max-width: 38rem; }
 .tpl-letter .reading-header { text-align: right; }
-.tpl-letter .reading-title { font-family: var(--font-merriweather); font-weight: 400; font-style: italic; font-size: 2.5rem; }
 .tpl-letter .reading-header::before {
-  content: "Dear reader,"; display: block;
-  font-family: var(--font-merriweather); font-style: italic;
+  content: "Dear reader,"; display: block; font-family: var(--font-merriweather); font-style: italic;
   color: var(--color-fg-muted); margin-bottom: 1rem; text-align: left;
 }
+.tpl-letter .reading-title { font-family: var(--font-merriweather); font-weight: 400; font-style: italic; font-size: 2.5rem; }
+.tpl-letter .reading-byline { justify-content: flex-end; font-style: italic; }
 .tpl-letter .prose-blog > p:first-of-type::first-letter { all: unset; }
+.tpl-letter .prose-blog { line-height: 1.95; }
+.tpl-letter .prose-blog hr { border: 0; border-top: 1px solid var(--color-border); width: 50%; margin-left: auto; }
 
-/* 27. garden */
+/* 27. garden — botanical & organic: green palette, rounded-leaf cover,
+   leaf section dividers. */
 .tpl-garden { --color-surface: #f0f7e9; --color-surface-raised: #ffffff; --color-fg: #1b3a1b; --color-accent: #3f7a3f; --color-border: #c8dcb8; }
 .tpl-garden .reading-title { font-family: var(--font-merriweather); color: #1b3a1b; }
 .tpl-garden .reading-cover { border-radius: 50% / 5%; overflow: hidden; }
 .tpl-garden .topic-pill { background: #d4eaca; border-color: #3f7a3f; color: #1b3a1b; }
+.tpl-garden .prose-blog hr { border: 0; text-align: center; }
+.tpl-garden .prose-blog hr::after { content: "❧"; color: var(--color-accent); font-size: 1.4rem; }
+.tpl-garden .prose-blog h2 { color: var(--color-accent); }
+.tpl-garden .prose-blog blockquote { border-left: 3px solid var(--color-accent); background: rgba(63, 122, 63, 0.06); }
 
 
 /* ════════════════════════════════════════════════════════════════════════════
    Family 5 — Tech / Code (3)
    ════════════════════════════════════════════════════════════════════════════ */
 
-/* 28. dev-blog */
+/* 28. dev-blog — GitHub-dark terminal: mono title, "$ cat" prompt kicker,
+   code-styled blockquotes, bordered code blocks. */
 .tpl-dev-blog {
   --color-surface: #0d1117; --color-surface-raised: #161b22; --color-surface-sunken: #010409;
   --color-fg: #e6edf3; --color-fg-muted: #8b949e; --color-fg-subtle: #6e7681;
   --color-border: #30363d; --color-accent: #58a6ff; --color-accent-soft: rgba(88, 166, 255, 0.10);
 }
-.tpl-dev-blog .reading-title { font-family: ui-monospace, "JetBrains Mono", monospace; font-weight: 600; font-size: 2.25rem; }
-.tpl-dev-blog .reading-deck { font-family: ui-monospace, monospace; font-style: normal; }
+.tpl-dev-blog .reading-header::before { content: "$ cat post.md"; display: block; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.78rem; color: #3fb950; margin-bottom: 0.75rem; }
+.tpl-dev-blog .reading-title { font-family: "JetBrains Mono", ui-monospace, monospace; font-weight: 600; font-size: 2.25rem; }
+.tpl-dev-blog .reading-deck { font-family: "JetBrains Mono", ui-monospace, monospace; font-style: normal; }
+.tpl-dev-blog .reading-byline { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.78rem; }
 .tpl-dev-blog .prose-blog { font-family: var(--font-inter); }
 .tpl-dev-blog .prose-blog > p:first-of-type::first-letter { all: unset; }
+.tpl-dev-blog .prose-blog h2 { font-family: "JetBrains Mono", ui-monospace, monospace; }
+.tpl-dev-blog .prose-blog h2::before { content: "# "; color: var(--color-accent); }
 .tpl-dev-blog .prose-blog pre { border: 1px solid var(--color-border); background: #010409; }
+.tpl-dev-blog .prose-blog blockquote { font-family: "JetBrains Mono", ui-monospace, monospace; border-left: 3px solid #3fb950; background: var(--color-surface-sunken); }
 
-/* 29. documentation */
+/* 29. documentation — docs site: clean Inter, "On this page" eyebrow,
+   underlined h2 sections, info-callout blockquotes, emphasized inline code. */
 .tpl-documentation { --color-surface: #ffffff; --color-fg: #1f2328; --color-accent: #0969da; --color-border: #d0d7de; }
+.tpl-documentation .reading-header::before { content: "DOCS · ON THIS PAGE"; display: block; font-family: var(--font-inter); font-size: 0.66rem; font-weight: 600; letter-spacing: 0.12em; color: var(--color-accent); margin-bottom: 0.75rem; }
 .tpl-documentation .reading-title { font-family: var(--font-inter); font-weight: 600; font-size: 2.25rem; letter-spacing: -0.015em; }
 .tpl-documentation .reading-deck { font-family: var(--font-inter); font-style: normal; font-weight: 400; }
 .tpl-documentation .prose-blog { font-family: var(--font-inter); font-size: 1rem; line-height: 1.7; }
 .tpl-documentation .prose-blog > p:first-of-type::first-letter { all: unset; }
 .tpl-documentation .prose-blog h2 { font-size: 1.5rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--color-border); }
 .tpl-documentation .prose-blog h3 { font-size: 1.125rem; }
+.tpl-documentation .prose-blog code { background: rgba(9, 105, 218, 0.08); color: #0550ae; padding: 0.1rem 0.35rem; border-radius: 0.3rem; }
+.tpl-documentation .prose-blog blockquote { background: rgba(9, 105, 218, 0.06); border-left: 4px solid var(--color-accent); border-radius: 0.4rem; padding: 0.85rem 1rem; font-style: normal; }
 
-/* 30. mdx-modern */
+/* 30. mdx-modern — Vercel/MDX dark: gradient display title, gradient links,
+   neon-pink section markers. */
 .tpl-mdx-modern {
   --color-surface: #000000; --color-surface-raised: #0a0a0a; --color-surface-sunken: #050505;
   --color-fg: #fafafa; --color-fg-muted: #a3a3a3; --color-fg-subtle: #737373;
@@ -303,6 +441,7 @@
 .tpl-mdx-modern .reading-title { font-family: var(--font-inter); font-weight: 700; font-size: 3.25rem; background: linear-gradient(135deg, #fff 30%, #888 100%); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: -0.025em; }
 .tpl-mdx-modern .reading-deck { font-family: var(--font-inter); font-style: normal; }
 .tpl-mdx-modern .prose-blog > p:first-of-type::first-letter { all: unset; }
+.tpl-mdx-modern .prose-blog h2::before { content: "# "; background-image: linear-gradient(90deg, #ec4899, #8b5cf6); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .tpl-mdx-modern .prose-blog a { background-image: linear-gradient(90deg, #ec4899, #8b5cf6); -webkit-background-clip: text; background-clip: text; color: transparent; text-decoration: none; border-bottom: 1px solid rgba(236, 72, 153, 0.4); }
 
 
@@ -371,50 +510,72 @@
    Where a scope changes ONLY the palette, the variables already cascade and
    no further preview overrides are needed. ── */
 
-.tpl-nyt-style .tpl-preview-title,
-.tpl-newspaper-justified .tpl-preview-title,
-.tpl-vogue-editorial .tpl-preview-title,
-.tpl-paris-review .tpl-preview-title,
-.tpl-atlantic .tpl-preview-title,
-.tpl-atlantic-dark .tpl-preview-title,
-.tpl-literary-review .tpl-preview-title,
-.tpl-kinfolk .tpl-preview-title,
+/* Merriweather titles */
+.tpl-medium-classic .tpl-preview-title,
 .tpl-paper-pure .tpl-preview-title,
-.tpl-vellum .tpl-preview-title,
 .tpl-linen .tpl-preview-title,
-.tpl-garden .tpl-preview-title,
-.tpl-medium-classic .tpl-preview-title { font-family: var(--font-merriweather); }
+.tpl-garden .tpl-preview-title { font-family: var(--font-merriweather); }
 
-.tpl-monocle-modern .tpl-preview-title,
+/* Inter titles */
 .tpl-ghost-publication .tpl-preview-title,
-.tpl-swiss-grid .tpl-preview-title,
 .tpl-notion-clean .tpl-preview-title,
 .tpl-fog .tpl-preview-title,
 .tpl-dawn .tpl-preview-title,
 .tpl-neobrutalist .tpl-preview-title,
-.tpl-manifesto .tpl-preview-title,
-.tpl-synthwave .tpl-preview-title,
-.tpl-documentation .tpl-preview-title { font-family: var(--font-inter); }
+.tpl-synthwave .tpl-preview-title { font-family: var(--font-inter); }
 
+/* Playfair Display titles (Didone editorial) */
+.tpl-nyt-style .tpl-preview-title,
+.tpl-newspaper-justified .tpl-preview-title,
+.tpl-vogue-editorial .tpl-preview-title,
+.tpl-atlantic .tpl-preview-title,
+.tpl-atlantic-dark .tpl-preview-title { font-family: "Playfair Display", Georgia, serif; font-weight: 800; }
+
+/* Fraunces titles (characterful old-style serif) */
+.tpl-kinfolk .tpl-preview-title,
+.tpl-paris-review .tpl-preview-title,
+.tpl-literary-review .tpl-preview-title,
+.tpl-vellum .tpl-preview-title { font-family: "Fraunces", Georgia, serif; }
+.tpl-kinfolk .tpl-preview-title { font-weight: 300; }
+.tpl-paris-review .tpl-preview-title,
+.tpl-literary-review .tpl-preview-title { font-style: italic; }
+
+/* Space Grotesk titles (grotesk display) */
+.tpl-monocle-modern .tpl-preview-title,
+.tpl-swiss-grid .tpl-preview-title,
+.tpl-manifesto .tpl-preview-title,
+.tpl-documentation .tpl-preview-title { font-family: "Space Grotesk", var(--font-inter), sans-serif; }
+.tpl-documentation .tpl-preview-title { font-family: var(--font-inter); font-weight: 600; }
+
+/* Monospace titles */
 .tpl-brutalist .tpl-preview-title,
 .tpl-cyberpunk .tpl-preview-title,
 .tpl-dev-blog .tpl-preview-title,
-.tpl-zine .tpl-preview-title { font-family: ui-monospace, "JetBrains Mono", monospace; text-transform: uppercase; }
+.tpl-zine .tpl-preview-title { font-family: "JetBrains Mono", ui-monospace, monospace; text-transform: uppercase; }
 
-.tpl-vogue-editorial .tpl-preview-title,
-.tpl-newspaper-justified .tpl-preview-title { font-family: "Playfair Display", Georgia, serif; }
-
+/* Caveat (handwritten) */
 .tpl-journal .tpl-preview-title,
 .tpl-journal .tpl-preview-deck { font-family: "Caveat", cursive; font-weight: 700; }
 
-.tpl-letter .tpl-preview-title { font-style: italic; }
+/* Source Serif body */
+.tpl-ghost-publication .tpl-preview-body p { font-family: "Source Serif 4", Georgia, serif; }
 
+/* Per-scope preview signatures */
+.tpl-letter .tpl-preview-title { font-family: var(--font-merriweather); font-style: italic; }
 .tpl-zine .tpl-preview-title { transform: rotate(-1deg); }
+.tpl-cyberpunk .tpl-preview-title { color: #00e5ff; text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
+.tpl-swiss-grid .tpl-preview-title { text-transform: uppercase; letter-spacing: -0.02em; }
+.tpl-vogue-editorial .tpl-preview-title { font-weight: 900; }
 
-.tpl-mdx-modern .tpl-preview-title {
+.tpl-mdx-modern .tpl-preview-title,
+.tpl-synthwave .tpl-preview-title {
   background: linear-gradient(135deg, #fff 30%, #888 100%);
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
+.tpl-synthwave .tpl-preview-title { background: linear-gradient(135deg, #ff79c6, #50fa7b); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
+/* Centered editorial previews */
 .tpl-paris-review .tpl-preview,
-.tpl-ghost-publication .tpl-preview { text-align: center; }
+.tpl-ghost-publication .tpl-preview,
+.tpl-vogue-editorial .tpl-preview,
+.tpl-kinfolk .tpl-preview { text-align: center; }

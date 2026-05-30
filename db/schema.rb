@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_01_000013) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_29_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -90,12 +90,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_01_000013) do
     t.string "title", limit: 255, null: false
     t.datetime "updated_at", null: false
     t.integer "word_count"
+    t.index ["author_id", "slug"], name: "index_blogs_on_author_id_and_slug", unique: true
     t.index ["author_id"], name: "index_blogs_on_author_id"
     t.index ["deleted_at"], name: "index_blogs_on_deleted_at"
     t.index ["featured"], name: "index_blogs_on_featured"
     t.index ["published_at"], name: "index_blogs_on_published_at"
     t.index ["scheduled_at"], name: "index_blogs_on_scheduled_at"
-    t.index ["slug"], name: "index_blogs_on_slug", unique: true
     t.index ["status"], name: "index_blogs_on_status"
     t.index ["template_id"], name: "index_blogs_on_template_id"
   end
@@ -238,12 +238,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_01_000013) do
     t.enum "role", default: "user", null: false, enum_type: "user_role"
     t.string "unconfirmed_email"
     t.datetime "updated_at", null: false
+    t.string "username", limit: 50, null: false
     t.text "website_url"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["deleted_at"], name: "index_users_on_deleted_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["role"], name: "index_users_on_role"
+    t.index ["username"], name: "index_users_on_username", unique: true
   end
 
   add_foreign_key "api_webhooks", "users"

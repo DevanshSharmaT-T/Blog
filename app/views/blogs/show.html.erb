@@ -36,7 +36,7 @@
       <%= render "shared/avatar", user: @blog.author %>
       <span>
         By
-        <a href="<%= user_path(@blog.author) rescue '#' %>" rel="author" itemprop="url">
+        <a href="<%= public_profile_url_for(@blog.author) %>" rel="author" itemprop="url">
           <span itemprop="name"><%= @blog.author.name %></span>
         </a>
         <span class="sep">·</span>
@@ -66,6 +66,7 @@
   <% if @related_blogs.any? %>
     <section class="reading-container reading-related" aria-label="Related posts">
       <h2>Continue reading</h2>
+      <p class="related-subtitle">More from <%= @blog.topics.first&.name.presence || SeoHelper::SITE_NAME %></p>
       <div class="related-grid">
         <% @related_blogs.each do |related| %>
           <%= render "blogs/card", blog: related %>

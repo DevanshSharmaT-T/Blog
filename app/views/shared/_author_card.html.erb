@@ -1,4 +1,5 @@
 <%# Locals: user (required) %>
+<% socials = user.public_socials %>
 <aside class="author-card" itemscope itemtype="https://schema.org/Person">
   <div class="author-card-avatar">
     <% if user.avatar_url.present? %>
@@ -8,14 +9,37 @@
     <% end %>
   </div>
   <div class="author-card-body">
-    <h3 itemprop="name">Written by <%= user.name %></h3>
+    <p class="author-card-eyebrow">Written by</p>
+    <h3 itemprop="name">
+      <%= link_to user.name, public_profile_url_for(user), itemprop: "url" %>
+    </h3>
     <% if user.bio.present? %>
       <p itemprop="description"><%= user.bio %></p>
     <% else %>
-      <p>Writer on MyBlog.</p>
+      <p>Writer on <%= SeoHelper::SITE_NAME %>.</p>
     <% end %>
-    <% if user.website_url.present? %>
-      <%= link_to "Visit website →", user.website_url, target: "_blank", rel: "noopener author", itemprop: "url" %>
-    <% end %>
+
+    <div class="author-card-actions">
+      <% if socials.any? %>
+        <div class="author-card-socials">
+          <% socials.first(2).each do |social| %>
+            <% url = social_url(social) %>
+            <% if url.present? %>
+              <%= link_to url, target: "_blank", rel: "noopener me",
+                    class: "author-card-social", title: social.social_platform.name,
+                    aria: { label: social.social_platform.name } do %>
+                <%= social_icon(social) %>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+
+      <%# Link to the full profile when there are more socials than the two shown,
+          or whenever there's a website to surface alongside the post archive. %>
+      <% if socials.size > 2 || user.website_url.present? %>
+        <%= link_to "View profile →", public_profile_url_for(user), class: "author-card-profile-link" %>
+      <% end %>
+    </div>
   </div>
 </aside>

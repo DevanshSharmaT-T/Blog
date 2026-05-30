@@ -7,7 +7,39 @@
   </div>
 </div>
 
-<div class="page-content max-w-3xl space-y-8">
+<div class="page-content space-y-8">
+
+  <!-- Add new connection -->
+  <div class="card p-6">
+    <h2 class="text-base font-semibold text-gray-900 dark:text-white mb-5">Connect a Platform</h2>
+    <%= form_with url: settings_socials_path, method: :post, html: { class: "space-y-4" } do |f| %>
+      <div class="form-group">
+        <label for="social_platform_id" class="form-label">Platform</label>
+        <select name="social_platform_id" id="social_platform_id" class="form-input">
+          <option value="">Select a platform…</option>
+          <% (@social_platforms - @user_socials.map(&:social_platform)).each do |platform| %>
+            <option value="<%= platform.id %>"><%= platform.name %></option>
+          <% end %>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="handle" class="form-label">Handle / Username</label>
+        <input type="text" name="handle" id="handle" class="form-input" placeholder="e.g. @yourname" required>
+      </div>
+      <div class="form-group">
+        <label for="profile_url" class="form-label">Profile URL <span class="text-gray-500">(optional)</span></label>
+        <input type="url" name="profile_url" id="profile_url" class="form-input" placeholder="https://…">
+      </div>
+      <div class="flex items-center gap-3">
+        <input type="checkbox" name="is_public" id="is_public" value="1" checked
+               class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-violet-600 focus:ring-violet-500">
+        <label for="is_public" class="text-sm text-gray-700 dark:text-gray-300">Show on public profile</label>
+      </div>
+      <div class="flex justify-end">
+        <button type="submit" class="btn btn-primary">Connect Platform</button>
+      </div>
+    <% end %>
+  </div>
 
   <!-- Connected platforms -->
   <div class="card overflow-hidden">
@@ -49,38 +81,6 @@
     <% else %>
       <div class="py-12 text-center">
         <p class="text-gray-500 text-sm">No platforms connected yet.</p>
-      </div>
-    <% end %>
-  </div>
-
-  <!-- Add new connection -->
-  <div class="card p-6">
-    <h2 class="text-base font-semibold text-gray-900 dark:text-white mb-5">Connect a Platform</h2>
-    <%= form_with url: settings_socials_path, method: :post, html: { class: "space-y-4" } do |f| %>
-      <div class="form-group">
-        <label for="social_platform_id" class="form-label">Platform</label>
-        <select name="social_platform_id" id="social_platform_id" class="form-input">
-          <option value="">Select a platform…</option>
-          <% (@social_platforms - @user_socials.map(&:social_platform)).each do |platform| %>
-            <option value="<%= platform.id %>"><%= platform.name %></option>
-          <% end %>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="handle" class="form-label">Handle / Username</label>
-        <input type="text" name="handle" id="handle" class="form-input" placeholder="e.g. @yourname" required>
-      </div>
-      <div class="form-group">
-        <label for="profile_url" class="form-label">Profile URL <span class="text-gray-500">(optional)</span></label>
-        <input type="url" name="profile_url" id="profile_url" class="form-input" placeholder="https://…">
-      </div>
-      <div class="flex items-center gap-3">
-        <input type="checkbox" name="is_public" id="is_public" value="1" checked
-               class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-violet-600 focus:ring-violet-500">
-        <label for="is_public" class="text-sm text-gray-700 dark:text-gray-300">Show on public profile</label>
-      </div>
-      <div class="flex justify-end">
-        <button type="submit" class="btn btn-primary">Connect Platform</button>
       </div>
     <% end %>
   </div>

@@ -1,7 +1,7 @@
 <%# Locals: blog (required) %>
 <article class="blog-card" itemscope itemtype="https://schema.org/BlogPosting">
   <% if blog.cover_image_url.present? %>
-    <%= link_to public_blog_path(slug: blog.slug), class: "blog-card-cover", "aria-label": blog.title do %>
+    <%= link_to public_blog_url_for(blog), class: "blog-card-cover", "aria-label": blog.title do %>
       <img src="<%= blog.cover_image_url %>"
            alt="<%= blog.title %>"
            loading="lazy"
@@ -17,7 +17,7 @@
     </div>
 
     <h3 class="blog-card-title">
-      <%= link_to blog.title, public_blog_path(slug: blog.slug), itemprop: "headline url" %>
+      <%= link_to blog.title, public_blog_url_for(blog), itemprop: "headline url" %>
     </h3>
 
     <% if blog.excerpt.present? %>

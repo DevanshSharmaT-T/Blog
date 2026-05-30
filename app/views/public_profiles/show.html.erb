@@ -1,0 +1,73 @@
+<% content_for :title, @author.name %>
+<% content_for :meta_description, (@author.bio.presence || "#{@author.name} on #{SeoHelper::SITE_NAME}").to_s.squish.truncate(160) %>
+
+<div class="profile-page">
+  <header class="profile-hero">
+    <div class="profile-hero-inner">
+      <div class="profile-avatar">
+        <% if @author.avatar_url.present? %>
+          <img src="<%= @author.avatar_url %>" alt="<%= @author.name %>">
+        <% else %>
+          <span><%= @author.name.to_s[0].to_s.upcase %></span>
+        <% end %>
+      </div>
+
+      <h1 class="profile-name"><%= @author.name %></h1>
+      <p class="profile-handle">@<%= @author.username %></p>
+
+      <% if @author.bio.present? %>
+        <p class="profile-bio"><%= @author.bio %></p>
+      <% end %>
+
+      <div class="profile-links">
+        <% if @author.website_url.present? %>
+          <%= link_to @author.website_url, target: "_blank", rel: "noopener", class: "profile-website" do %>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-9c1.657 0 3 4.03 3 9s-1.343 9-3 9-3-4.03-3-9 1.343-9 3-9zM3.6 9h16.8M3.6 15h16.8"/></svg>
+            <span><%= @author.website_url.sub(%r{\Ahttps?://}, "").sub(%r{/\z}, "") %></span>
+          <% end %>
+        <% end %>
+
+        <% if @socials.any? %>
+          <div class="profile-socials">
+            <% @socials.each do |social| %>
+              <% url = social_url(social) %>
+              <% if url.present? %>
+                <%= link_to url, target: "_blank", rel: "noopener me",
+                      class: "profile-social-btn", title: social.social_platform.name,
+                      aria: { label: social.social_platform.name } do %>
+                  <%= social_icon(social) %>
+                <% end %>
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <p class="profile-stat">
+        <strong><%= @author.blogs.visible.count %></strong>
+        <%= "post".pluralize(@author.blogs.visible.count) %>
+        <span class="sep">·</span>
+        Joined <%= @author.created_at.strftime("%B %Y") %>
+      </p>
+    </div>
+  </header>
+
+  <section class="profile-posts reading-container">
+    <h2>Posts</h2>
+    <% if @blogs.any? %>
+      <div class="related-grid profile-grid">
+        <% @blogs.each do |blog| %>
+          <%= render "blogs/card", blog: blog %>
+        <% end %>
+      </div>
+
+      <% if @pagy.pages > 1 %>
+        <nav class="profile-pagination" aria-label="Pagination">
+          <%== pagy_nav(@pagy) %>
+        </nav>
+      <% end %>
+    <% else %>
+      <p class="profile-empty">No published posts yet.</p>
+    <% end %>
+  </section>
+</div>

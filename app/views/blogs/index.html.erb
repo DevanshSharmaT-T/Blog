@@ -28,7 +28,7 @@
     <%= link_to "Clear", blogs_path, class: "btn btn-secondary self-end" %>
   <% end %>
 
-  <!-- Bulk actions form -->
+  <!-- Bulk actions form (kept separate from the table so per-row button_to forms aren't nested inside it) -->
   <%= form_with url: bulk_action_blogs_path, method: :post, id: "bulk-form" do |f| %>
     <div id="bulk-bar" class="hidden mb-4 flex items-center gap-3 bg-violet-500/10 border border-violet-500/20 rounded-xl px-4 py-3">
       <span id="selected-count" class="text-sm text-violet-700 dark:text-violet-300 font-medium">0 selected</span>
@@ -37,8 +37,9 @@
       <button type="button" onclick="setBulkAction('archive')" class="btn btn-secondary btn-sm">Archive</button>
       <button type="button" onclick="setBulkAction('delete')"  class="btn btn-danger  btn-sm">Delete</button>
     </div>
+  <% end %>
 
-    <div class="card overflow-hidden">
+  <div class="card overflow-hidden">
       <% if @blogs.any? %>
         <table class="data-table" aria-label="Blog posts">
           <thead>
@@ -59,7 +60,7 @@
             <% @blogs.each do |blog| %>
               <tr>
                 <td>
-                  <input type="checkbox" name="blog_ids[]" value="<%= blog.id %>"
+                  <input type="checkbox" name="blog_ids[]" value="<%= blog.id %>" form="bulk-form"
                          aria-label="Select <%= blog.title %>"
                          class="blog-checkbox rounded border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-violet-600 focus:ring-violet-500">
                 </td>
@@ -116,8 +117,7 @@
           <%= link_to "Create Blog", new_blog_path, class: "btn btn-primary mt-4 mx-auto" %>
         </div>
       <% end %>
-    </div>
-  <% end %>
+  </div>
 </div>
 
 <script>

@@ -11,12 +11,19 @@
     </p>
   </header>
 
+  <nav class="archive-filters" aria-label="Browse">
+    <%= link_to "All posts", blog_archive_path(topic_id: params[:topic_id]),
+          class: "topic-pill #{'active' if @tab != 'developers'}" %>
+    <%= link_to "From the developers", blog_archive_path(tab: "developers", topic_id: params[:topic_id]),
+          class: "topic-pill #{'active' if @tab == 'developers'}" %>
+  </nav>
+
   <% if @topics.any? %>
     <nav class="archive-filters" aria-label="Filter by topic">
-      <%= link_to "All", blog_archive_path,
+      <%= link_to "All", blog_archive_path(tab: @tab),
             class: "topic-pill #{'active' if params[:topic_id].blank?}" %>
       <% @topics.each do |topic| %>
-        <%= link_to topic.name, blog_archive_path(topic_id: topic.id),
+        <%= link_to topic.name, blog_archive_path(tab: @tab, topic_id: topic.id),
               class: "topic-pill #{'active' if params[:topic_id].to_s == topic.id.to_s}" %>
       <% end %>
     </nav>

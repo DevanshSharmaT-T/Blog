@@ -1,0 +1,25 @@
+<%# Searchable grid picker for a Topic's icon. Expects local `f` (form builder). %>
+<div class="form-group" data-controller="icon-picker">
+  <%= f.label :icon_name, "Icon", class: "form-label" %>
+
+  <%= f.hidden_field :icon_name, data: { "icon-picker-target": "field" } %>
+
+  <input type="text" class="form-input mb-3" placeholder="Search icons…"
+         aria-label="Search icons by name"
+         data-icon-picker-target="search"
+         data-action="input->icon-picker#filter">
+
+  <div class="icon-picker-grid" role="radiogroup" aria-label="Topic icon">
+    <% icon_library_names.each do |name| %>
+      <button type="button" class="icon-tile"
+              title="<%= name %>"
+              data-name="<%= name %>"
+              data-icon-picker-target="tile"
+              data-action="click->icon-picker#select">
+        <%= topic_icon(name, class: "w-5 h-5") %>
+        <span class="sr-only"><%= name %></span>
+      </button>
+    <% end %>
+  </div>
+  <p class="form-hint mt-2">Pick an icon shown on topic cards and headers.</p>
+</div>

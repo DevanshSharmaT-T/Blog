@@ -12,8 +12,25 @@ Rails.application.routes.draw do
   root to: "pages#home"
   get "blog",           to: "blogs#listing", as: :blog_archive
   get "blog/feed",      to: "blogs#feed",    as: :blog_feed, defaults: { format: :atom }
-  get "blog/:slug",     to: "blogs#show",    as: :public_blog
   get "sitemap.xml",    to: "sitemaps#show", defaults: { format: :xml }, as: :sitemap
+
+  # Public blog posts live on the author's sub-host: <username>.<apex>/blog/<slug>
+  # (declared after /blog and /blog/feed so those apex routes win on any host).
+  # Match by host-suffix against the configured apex rather than ActionDispatch's
+  # subdomain parsing, which depends on tld_length and fails for `*.localhost`.
+  blog_host_constraint = lambda do |request|
+    apex = Rails.application.routes.default_url_options[:host].to_s
+    host = request.host.to_s
+    apex.present? && host != apex && host.end_with?(".#{apex}")
+  end
+  constraints(blog_host_constraint) do
+    get "blog/:slug", to: "blogs#show", as: :public_blog
+    # Public author profile — the author is derived from the sub-host.
+    get "about", to: "public_profiles#show", as: :public_profile
+  end
+  # `new` must be declared before the `:show` route below, otherwise `/topics/new`
+  # is captured by `/topics/:id` (id="new"). Auth is enforced in TopicsController.
+  get "topics/new",     to: "topics#new", as: :new_topic
   resources :topics,    only: [ :index, :show ]
   resources :templates, only: [ :index, :show ]
 
@@ -35,7 +52,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :topics,    only: [ :new, :create, :edit, :update, :destroy ]
+    resources :topics,    only: [ :create, :edit, :update, :destroy ]
     resources :templates, except: [ :index, :show ]
 
     resources :users, only: [ :index, :show, :update, :destroy ] do

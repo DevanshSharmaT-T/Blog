@@ -18,7 +18,7 @@ xml.urlset(xmlns: "http://www.sitemaps.org/schemas/sitemap/0.9") do
 
   @blogs.each do |blog|
     xml.url do
-      xml.loc        public_blog_url(slug: blog.slug)
+      xml.loc        public_blog_url_for(blog)
       xml.lastmod    blog.updated_at.iso8601
       xml.changefreq "weekly"
       xml.priority   0.8

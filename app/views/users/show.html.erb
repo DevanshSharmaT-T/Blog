@@ -75,7 +75,7 @@
           <div class="py-3 flex items-center justify-between">
             <div class="min-w-0">
               <% if blog.published_status? %>
-                <%= link_to blog.title, public_blog_path(slug: blog.slug), class: "text-sm font-medium text-gray-900 dark:text-white hover:text-violet-600 dark:hover:text-violet-400 truncate block" %>
+                <%= link_to blog.title, public_blog_url_for(blog), class: "text-sm font-medium text-gray-900 dark:text-white hover:text-violet-600 dark:hover:text-violet-400 truncate block" %>
               <% else %>
                 <p class="text-sm font-medium text-gray-900 dark:text-white truncate"><%= blog.title %></p>
               <% end %>

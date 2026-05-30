@@ -61,7 +61,7 @@
 </article>
 
 <!-- Picker toolbar -->
-<aside class="template-picker-bar">
+<aside class="template-picker-bar <%= 'template-picker-bar--with-sidebar' if sidebar_visible? %>">
   <div class="template-picker-inner">
     <div>
       <p class="template-picker-name"><%= @template.name %></p>

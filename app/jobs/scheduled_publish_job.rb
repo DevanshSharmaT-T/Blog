@@ -10,12 +10,7 @@ class ScheduledPublishJob < ApplicationJob
 
     blogs.find_each do |blog|
       blog.publish!
-      WebhookDispatchJob.perform_later("blog.published", {
-        blog_id:    blog.id,
-        title:      blog.title,
-        author_id:  blog.author_id,
-        published_at: blog.published_at.iso8601
-      })
+      WebhookDispatchJob.perform_later("blog.published", blog.published_webhook_payload)
     rescue StandardError => e
       Rails.logger.error "[ScheduledPublishJob] Failed to publish blog #{blog.id}: #{e.message}"
     end

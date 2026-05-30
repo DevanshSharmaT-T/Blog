@@ -33,8 +33,11 @@ class BlogsController < ApplicationController
 
   # GET /blog (public archive — paginated listing of published blogs)
   def listing
+    @tab = params[:tab].presence
     scope = Blog.visible.includes(:author, :topics).order(published_at: :desc)
     scope = scope.joins(:topics).where(topics: { id: params[:topic_id] }) if params[:topic_id].present?
+    # "From the developers" tab — posts authored by the site's owners/admins.
+    scope = scope.joins(:author).where(users: { role: %w[owner admin] }) if @tab == "developers"
     @q = scope.ransack(params[:q])
     @pagy, @blogs = pagy(@q.result(distinct: true), items: 12)
     @topics = Topic.active.by_name
@@ -115,12 +118,7 @@ class BlogsController < ApplicationController
   # PATCH /blogs/:id/publish
   def publish
     @blog.publish!
-    WebhookDispatchJob.perform_later("blog.published", {
-      blog_id:     @blog.id,
-      title:       @blog.title,
-      author_id:   @blog.author_id,
-      published_at: @blog.published_at.iso8601
-    })
+    WebhookDispatchJob.perform_later("blog.published", @blog.published_webhook_payload)
     redirect_to blogs_path, notice: "\"#{@blog.title}\" is now live!"
   end
 
@@ -135,6 +133,9 @@ class BlogsController < ApplicationController
   def submit_review
     @blog.submit_for_review!
     redirect_to blogs_path, notice: "Blog submitted for review."
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_to edit_blog_path(@blog, step: :content),
+                alert: "Can't submit for review: #{e.record.errors.full_messages.to_sentence}."
   end
 
   # POST /blogs/:id/schedule
@@ -169,12 +170,18 @@ class BlogsController < ApplicationController
 
   def set_blog
     @blog = if action_name == "show"
-              Blog.visible.includes(:template, :author, :topics).find_by!(slug: params[:slug])
+              # Public posts are served from the author's sub-host: <username>.<apex>/blog/<slug>.
+              # Derive the username by stripping the apex host suffix (host-suffix routing,
+              # not tld_length-based subdomain parsing). Visibility/preview enforced in #show.
+              apex     = Rails.application.routes.default_url_options[:host].to_s
+              username = request.host.to_s.delete_suffix(".#{apex}")
+              author   = User.find_by!(username: username)
+              author.blogs.not_deleted.includes(:template, :author, :topics).find_by!(slug: params[:slug])
             else
               Blog.not_deleted.find(params[:id])
             end
   rescue ActiveRecord::RecordNotFound
-    redirect_to root_path, alert: "Blog not found." and return
+    redirect_to root_url(host: Rails.application.routes.default_url_options[:host]), alert: "Blog not found." and return
   end
 
   def authorize_blog!

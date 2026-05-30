@@ -31,13 +31,22 @@ Rails.application.configure do
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
 
+  # Public blog posts are served on per-user subdomains: <username>.localhost:3002.
+  # `*.localhost` resolves to 127.0.0.1 in modern browsers (offline, no DNS); `lvh.me`
+  # is kept as an online fallback. Allow these hosts (Rails blocks unknown hosts).
+  config.hosts << /.*\.localhost/
+  config.hosts << "lvh.me"
+  config.hosts << /.*\.lvh\.me/
+  # Host used when generating absolute/subdomain URLs in dev (server runs on :3002).
+  config.action_controller.default_url_options = { host: "localhost", port: 3000 }
+
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
 
   # Make template changes take effect immediately.
   config.action_mailer.perform_caching = false
 
-  # Set localhost to be used by links generated in mailer templates.
+  # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
   # Print deprecation notices to the Rails logger.

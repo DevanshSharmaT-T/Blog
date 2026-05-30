@@ -10,17 +10,21 @@
 <div class="page-content">
   <%= search_form_for @q, url: users_path, html: { class: "mb-5" } do |s| %>
     <div class="flex items-center gap-3">
-      <%= s.search_field :name_or_email_cont,
-            class: "form-input flex-1",
-            placeholder: "Search by name or email…",
-            "aria-label": "Search users" %>
-      <%= s.select :role_eq,
-            options_for_select(
-              [["All roles", ""], ["Owner", "owner"], ["Admin", "admin"], ["User", "user"], ["Visitor", "visitor"]],
-              params.dig(:q, :role_eq)
-            ),
-            {}, class: "form-input w-40" %>
-      <%= s.submit "Filter", class: "btn btn-secondary" %>
+      <div class="flex-1 min-w-0">
+        <%= s.search_field :name_or_email_cont,
+              class: "form-input",
+              placeholder: "Search by name or email…",
+              "aria-label": "Search users" %>
+      </div>
+      <div class="w-44 shrink-0">
+        <%= s.select :role_eq,
+              options_for_select(
+                [["All roles", ""], ["Owner", "owner"], ["Admin", "admin"], ["User", "user"], ["Visitor", "visitor"]],
+                params.dig(:q, :role_eq)
+              ),
+              {}, class: "form-input" %>
+      </div>
+      <%= s.submit "Filter", class: "btn btn-secondary shrink-0" %>
     </div>
   <% end %>
 

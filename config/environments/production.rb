@@ -57,8 +57,12 @@ Rails.application.configure do
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
 
+  # Apex host used for absolute/subdomain blog URLs (set APP_HOST in prod, e.g. "myblog.com").
+  app_host = ENV.fetch("APP_HOST", "example.com")
+  config.action_controller.default_url_options = { host: app_host }
+
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "example.com" }
+  config.action_mailer.default_url_options = { host: app_host }
 
   # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
   # config.action_mailer.smtp_settings = {

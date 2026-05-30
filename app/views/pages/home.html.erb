@@ -54,6 +54,27 @@
   </div>
 </section>
 
+<!-- Featured posts -->
+<% if @featured_blogs.any? %>
+  <section class="home-section" aria-label="Featured posts">
+    <div class="home-section-inner">
+      <div class="home-section-header">
+        <div>
+          <h2 class="home-section-title">Featured</h2>
+          <p class="home-section-subtitle">Editor's picks to start with.</p>
+        </div>
+        <%= link_to "Browse all posts →", blog_archive_path,
+              class: "text-sm font-medium", style: "color: var(--color-accent);" %>
+      </div>
+      <div class="home-grid">
+        <% @featured_blogs.each do |blog| %>
+          <%= render "blogs/card", blog: blog %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+<% end %>
+
 <!-- Recent posts -->
 <% if @recent_blogs.any? %>
   <section class="home-section" aria-label="Recent blog posts">
@@ -77,6 +98,27 @@
 
       <div class="home-grid">
         <% @recent_blogs.each do |blog| %>
+          <%= render "blogs/card", blog: blog %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+<% end %>
+
+<!-- From the developers of this site -->
+<% if @developer_blogs.any? %>
+  <section class="home-section" aria-label="Posts from the developers">
+    <div class="home-section-inner">
+      <div class="home-section-header">
+        <div>
+          <h2 class="home-section-title">From the developers of this site</h2>
+          <p class="home-section-subtitle">Notes and updates from the team building MyBlog.</p>
+        </div>
+        <%= link_to "See all →", blog_archive_path(tab: "developers"),
+              class: "text-sm font-medium", style: "color: var(--color-accent);" %>
+      </div>
+      <div class="home-grid">
+        <% @developer_blogs.each do |blog| %>
           <%= render "blogs/card", blog: blog %>
         <% end %>
       </div>

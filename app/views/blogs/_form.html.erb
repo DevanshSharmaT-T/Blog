@@ -34,7 +34,7 @@
         aria_current = i == step_index ? 'step' : nil
       %>
       <% inner = capture do %>
-        <div class="<%= state_class %>"
+        <div class="step-indicator <%= state_class %>"
              aria-label="Step <%= i + 1 %>: <%= step[:label] %> (<%= aria_state %>)">
           <% if i < step_index %>
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
@@ -115,9 +115,14 @@
                        <%= @selected_topic_ids&.include?(topic.id) ? 'checked' : '' %>
                        class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-violet-600 focus:ring-violet-500">
                 <div>
-                  <% if topic.color_hex %>
-                    <div class="w-3 h-3 rounded-full mb-1 inline-block" style="background-color: <%= topic.color_hex %>"></div>
-                  <% end %>
+                  <div class="flex items-center gap-1.5 mb-1">
+                    <span style="color: <%= topic.color_hex || '#6366f1' %>">
+                      <%= topic_icon(topic.icon_name, class: "w-4 h-4") %>
+                    </span>
+                    <% if topic.color_hex %>
+                      <span class="w-3 h-3 rounded-full inline-block" style="background-color: <%= topic.color_hex %>"></span>
+                    <% end %>
+                  </div>
                   <p class="text-sm font-medium text-gray-800 dark:text-gray-200"><%= topic.name %></p>
                   <p class="text-xs text-gray-500"><%= pluralize(topic.post_count, 'post') %></p>
                 </div>
@@ -325,9 +330,13 @@
           <%= f.submit "Continue to Review →", class: "btn btn-primary" %>
         </div>
       </div>
+    <% end %>
 
-    <!-- STEP 4: Review & Publish -->
-    <% elsif current_step.to_sym == :review %>
+  <% end %>
+
+  <!-- STEP 4: Review & Publish — standalone block. Its publish / submit-review / schedule
+       actions are their own forms and must NOT be nested inside the edit form above. -->
+  <% if current_step.to_sym == :review %>
       <div class="space-y-5">
         <!-- Summary card -->
         <div class="card p-6 space-y-4">
@@ -418,7 +427,5 @@
           <%= link_to "← Back to Template", edit_blog_path(@blog, step: :template), class: "btn btn-secondary" %>
         </div>
       </div>
-    <% end %>
-
   <% end %>
 </div>

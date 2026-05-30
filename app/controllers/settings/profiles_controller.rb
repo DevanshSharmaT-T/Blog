@@ -28,11 +28,11 @@ module Settings
     private
 
     def profile_params
-      params.require(:user).permit(:name, :bio, :website_url, :avatar_url)
+      params.require(:user).permit(:name, :username, :bio, :website_url, :avatar_url)
     end
 
     def profile_params_with_password
-      params.require(:user).permit(:name, :bio, :website_url, :avatar_url, :email, :current_password)
+      params.require(:user).permit(:name, :username, :bio, :website_url, :avatar_url, :email, :current_password)
     end
   end
 end

@@ -22,11 +22,37 @@ module SeoHelper
   end
 
   def og_image
-    if @blog&.persisted? && @blog.cover_image_url.present?
-      @blog.cover_image_url
-    else
-      "#{request.base_url}#{DEFAULT_OG_IMAGE_PATH}"
-    end
+    img =
+      if @blog&.persisted? && @blog.cover_image_url.present?
+        @blog.cover_image_url
+      else
+        DEFAULT_OG_IMAGE_PATH
+      end
+    absolute_url(img)
+  end
+
+  # Canonical public URL for a blog, on its author's sub-host:
+  # <username>.<apex>/blog/<slug>. Build the host explicitly (not via the
+  # `subdomain:` option, which breaks on single-label hosts like `localhost`),
+  # so links are correct regardless of the host the visitor is currently on.
+  def public_blog_url_for(blog)
+    opts = Rails.application.routes.default_url_options
+    public_blog_url(slug: blog.slug, host: "#{blog.author.username}.#{opts[:host]}", port: opts[:port])
+  end
+
+  # Public author profile, served from the author's sub-host: <username>.<apex>/about.
+  # Built the same way as public_blog_url_for so links resolve regardless of the
+  # host the visitor is currently on.
+  def public_profile_url_for(user)
+    opts = Rails.application.routes.default_url_options
+    public_profile_url(host: "#{user.username}.#{opts[:host]}", port: opts[:port])
+  end
+
+  # Make a possibly-relative path (e.g. a dev-local "/uploads/..") absolute so
+  # crawlers and social cards always receive a full URL.
+  def absolute_url(path_or_url)
+    return path_or_url if path_or_url.to_s.match?(%r{\Ahttps?://})
+    "#{request.base_url}#{path_or_url}"
   end
 
   def blog_json_ld(blog)
@@ -48,7 +74,7 @@ module SeoHelper
       },
       "mainEntityOfPage" => {
         "@type" => "WebPage",
-        "@id"   => public_blog_url(slug: blog.slug)
+        "@id"   => public_blog_url_for(blog)
       },
       "wordCount" => blog.word_count,
       "keywords"  => blog.topics.map(&:name).join(", ")

@@ -4,7 +4,7 @@ atom_feed language: "en-US" do |feed|
   feed.updated(@blogs.first&.updated_at || Time.current)
 
   @blogs.each do |blog|
-    feed.entry(blog, url: public_blog_url(slug: blog.slug), published: blog.published_at, updated: blog.updated_at) do |entry|
+    feed.entry(blog, url: public_blog_url_for(blog), published: blog.published_at, updated: blog.updated_at) do |entry|
       entry.title  blog.title
       entry.summary (blog.excerpt.presence || blog.title), type: "text"
       entry.content render_blog_content(blog), type: "html"
