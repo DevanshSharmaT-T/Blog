@@ -107,7 +107,7 @@
         <!-- Topics multi-select -->
         <div>
           <p class="form-label">Topics</p>
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2" id="topic-grid">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2" id="topic-grid">
             <% (@topics || Topic.active.by_name).each do |topic| %>
               <label class="topic-chip">
                 <input type="checkbox" name="blog[topic_ids][]" value="<%= topic.id %>"
@@ -120,10 +120,10 @@
                       <%= topic_icon(topic.icon_name, class: "w-4 h-4") %>
                     </span>
                     <% if topic.color_hex %>
-                      <span class="w-3 h-3 rounded-full inline-block" style="background-color: <%= topic.color_hex %>"></span>
+                      <!--<span class="w-3 h-3 rounded-full inline-block" style="background-color: <%= topic.color_hex %>"></span>-->
                     <% end %>
-                  </div>
                   <p class="text-sm font-medium text-gray-800 dark:text-gray-200"><%= topic.name %></p>
+                  </div>
                   <p class="text-xs text-gray-500"><%= pluralize(topic.post_count, 'post') %></p>
                 </div>
               </label>
