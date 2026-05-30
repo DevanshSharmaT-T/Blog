@@ -65,9 +65,9 @@
 
   <% if @related_blogs.any? %>
     <section class="reading-container reading-related" aria-label="Related posts">
-      <h2>Continue reading</h2>
+      <h2>🗐 Continue reading</h2>
       <p class="related-subtitle">More from <%= @blog.topics.first&.name.presence || SeoHelper::SITE_NAME %></p>
-      <div class="related-grid">
+      <div>
         <% @related_blogs.each do |related| %>
           <%= render "blogs/card", blog: related %>
         <% end %>

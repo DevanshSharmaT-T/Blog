@@ -55,7 +55,7 @@
   <section class="profile-posts reading-container">
     <h2>Posts</h2>
     <% if @blogs.any? %>
-      <div class="related-grid profile-grid">
+      <div class="profile-grid">
         <% @blogs.each do |blog| %>
           <%= render "blogs/card", blog: blog %>
         <% end %>
