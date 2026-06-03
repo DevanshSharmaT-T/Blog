@@ -66,7 +66,13 @@
                 </td>
                 <td>
                   <div class="flex flex-col">
-                    <span class="font-medium text-gray-900 dark:text-white truncate max-w-xs"><%= blog.title %></span>
+                    <% if blog.published_status? %>
+                      <%= link_to blog.title, public_blog_url_for(blog), target: "_blank", rel: "noopener",
+                            class: "font-medium text-gray-900 dark:text-white hover:text-violet-600 dark:hover:text-violet-400 truncate max-w-xs" %>
+                    <% else %>
+                      <%= link_to blog.title, edit_blog_path(blog),
+                            class: "font-medium text-gray-900 dark:text-white hover:text-violet-600 dark:hover:text-violet-400 truncate max-w-xs" %>
+                    <% end %>
                     <span class="text-xs text-gray-500 mt-0.5">/<%= blog.slug %></span>
                   </div>
                 </td>

@@ -41,6 +41,9 @@ Rails.application.routes.draw do
     post "uploads", to: "uploads#create", as: :uploads
 
     resources :blogs, except: [ :show ] do
+      resources :images, only: [ :create, :destroy ], controller: "blog_images" do
+        delete :unused, on: :collection
+      end
       member do
         patch :publish
         patch :archive

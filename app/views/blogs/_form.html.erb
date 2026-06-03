@@ -141,10 +141,10 @@
     <% elsif current_step.to_sym == :content %>
       <div class="space-y-5">
         <!-- Title edit -->
-        <div class="card p-5 form-group">
-          <%= f.label :title, "Title", class: "form-label" %>
-          <%= f.text_field :title, class: "form-input text-lg font-semibold", placeholder: "Blog title…", required: true %>
-        </div>
+        <!--<div class="card p-5 form-group">-->
+          <%# f.label :title, "Title", class: "form-label" %>
+          <%# f.text_field :title, class: "form-input text-lg font-semibold", placeholder: "Blog title…", required: true %>
+        <!--</div>-->
 
         <!-- Excerpt -->
         <div class="card p-5 form-group">
@@ -153,10 +153,62 @@
           <p class="form-hint">Setting an excerpt adds +25 to your promotion score</p>
         </div>
 
+        <!-- Cover image -->
+        <div class="card p-5 form-group" data-controller="cover-preview image-upload">
+          <%= f.label :cover_image_url, "Cover Image", class: "form-label" %>
+
+          <!-- Drag & drop zone (hidden once an image is set) -->
+          <div data-image-upload-target="dropzone" data-cover-preview-target="dropzone"
+               class="mt-2 mb-3 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-6 text-center transition-colors cursor-pointer hover:border-violet-400 dark:hover:border-violet-500"
+               data-action="click->image-upload#pickFile">
+            <svg class="w-8 h-8 mx-auto text-gray-400 dark:text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.9 5 5 0 019.9-1A5.5 5.5 0 0118.5 16H7z"/></svg>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Drag &amp; drop an image, or <span class="text-violet-600 dark:text-violet-400 underline">browse</span></p>
+            <p class="text-xs text-gray-500 mt-1">PNG, JPG, WebP up to 10 MB</p>
+            <input type="file" accept="image/*" class="hidden"
+                   data-image-upload-target="fileInput"
+                   data-action="change->image-upload#fileChosen">
+          </div>
+
+          <div data-image-upload-target="spinner" class="hidden text-sm text-violet-600 dark:text-violet-400 mb-2">Uploading…</div>
+          <div data-image-upload-target="error"   class="hidden text-sm text-red-500 dark:text-red-400 mb-2"></div>
+
+          <!-- URL field (hidden once an image is set) -->
+          <div data-cover-preview-target="field">
+            <%= f.text_field :cover_image_url,
+                  class: "form-input",
+                  placeholder: "https://… (or upload above)",
+                  id: "cover_image_url",
+                  data: {
+                    cover_preview_target: "input",
+                    image_upload_target:  "urlField",
+                    action: "input->cover-preview#input"
+                  } %>
+            <p class="form-hint">Setting a cover image adds +25 to SEO and promotion scores.</p>
+          </div>
+
+          <!-- Preview thumbnail with hover-delete + click-to-open -->
+          <div data-cover-preview-target="preview" class="mt-3 hidden">
+            <div class="relative group w-80 h-80">
+              <a data-cover-preview-target="anchor" href="<%= @blog.cover_image_url %>" target="_blank" rel="noopener">
+                <img data-cover-preview-target="image" data-image-upload-target="image"
+                     src="<%= @blog.cover_image_url %>"
+                     alt="Cover preview"
+                     class="w-80 h-80 object-cover rounded-xl border border-gray-200 dark:border-gray-700">
+              </a>
+              <button type="button" data-action="click->cover-preview#remove"
+                      class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                      aria-label="Remove cover image">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Content -->
         <div class="card p-5 form-group"
              data-controller="markdown-editor"
-             data-markdown-editor-unique-id-value="<%= @blog.id || "new" %>">
+             data-markdown-editor-unique-id-value="<%= @blog.id || "new" %>"
+             <%= "data-markdown-editor-upload-url-value=#{blog_images_path(@blog)}" if @blog.persisted? %>>
           <div class="flex items-center justify-between mb-2">
             <%= f.label :content, "Content", class: "form-label mb-0" %>
             <div class="flex items-center gap-2 text-xs text-gray-500">
@@ -176,43 +228,39 @@
                 data: { markdown_editor_target: "textarea" } %>
         </div>
 
-        <!-- Cover image -->
-        <div class="card p-5 form-group" data-controller="cover-preview image-upload">
-          <%= f.label :cover_image_url, "Cover Image", class: "form-label" %>
+        <!-- Gallery images (additional post images) -->
+        <% if @blog.persisted? %>
+          <div class="card p-5 form-group" data-controller="image-gallery"
+               data-image-gallery-upload-url-value="<%= blog_images_path(@blog) %>"
+               data-image-gallery-cleanup-url-value="<%= unused_blog_images_path(@blog) %>">
+            <div class="flex items-center justify-between">
+              <p class="form-label mb-0">Images</p>
+              <button type="button" data-action="click->image-gallery#cleanup"
+                      class="btn btn-secondary btn-sm">Remove unused</button>
+            </div>
+            <p class="form-hint mb-2">Upload images here, then hover a thumbnail and click <span class="font-medium">Insert</span> to drop it into your content. You can also drag or paste images straight into the editor above. <span class="font-medium">Remove unused</span> deletes any image not used in the content.</p>
 
-          <!-- Drag & drop zone -->
-          <div data-image-upload-target="dropzone"
-               class="mt-2 mb-3 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-6 text-center transition-colors cursor-pointer hover:border-violet-400 dark:hover:border-violet-500"
-               data-action="click->image-upload#pickFile">
-            <svg class="w-8 h-8 mx-auto text-gray-400 dark:text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.9 5 5 0 019.9-1A5.5 5.5 0 0118.5 16H7z"/></svg>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Drag &amp; drop an image, or <span class="text-violet-600 dark:text-violet-400 underline">browse</span></p>
-            <p class="text-xs text-gray-500 mt-1">PNG, JPG, WebP up to 10 MB</p>
-            <input type="file" accept="image/*" class="hidden"
-                   data-image-upload-target="fileInput"
-                   data-action="change->image-upload#fileChosen">
+            <div data-image-gallery-target="dropzone"
+                 class="mt-2 mb-3 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-6 text-center transition-colors cursor-pointer hover:border-violet-400 dark:hover:border-violet-500"
+                 data-action="click->image-gallery#pickFile">
+              <svg class="w-8 h-8 mx-auto text-gray-400 dark:text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.9 5 5 0 019.9-1A5.5 5.5 0 0118.5 16H7z"/></svg>
+              <p class="text-sm text-gray-600 dark:text-gray-400">Drag &amp; drop images, or <span class="text-violet-600 dark:text-violet-400 underline">browse</span></p>
+              <p class="text-xs text-gray-500 mt-1">PNG, JPG, WebP up to 10 MB each · large images are compressed</p>
+              <input type="file" accept="image/*" multiple class="hidden"
+                     data-image-gallery-target="fileInput"
+                     data-action="change->image-gallery#fileChosen">
+            </div>
+
+            <div data-image-gallery-target="spinner" class="hidden text-sm text-violet-600 dark:text-violet-400 mb-2">Uploading…</div>
+            <div data-image-gallery-target="error"   class="hidden text-sm text-red-500 dark:text-red-400 mb-2"></div>
+
+            <div data-image-gallery-target="grid" class="grid grid-cols-3 gap-2 mt-3">
+              <% @blog.images.ordered.each do |image| %>
+                <%= render "blogs/image_tile", image: image, blog: @blog %>
+              <% end %>
+            </div>
           </div>
-
-          <div data-image-upload-target="spinner" class="hidden text-sm text-violet-600 dark:text-violet-400 mb-2">Uploading…</div>
-          <div data-image-upload-target="error"   class="hidden text-sm text-red-500 dark:text-red-400 mb-2"></div>
-
-          <%= f.url_field :cover_image_url,
-                class: "form-input",
-                placeholder: "https://… (or upload above)",
-                id: "cover_image_url",
-                data: {
-                  cover_preview_target: "input",
-                  image_upload_target:  "urlField",
-                  action: "input->cover-preview#input"
-                } %>
-          <p class="form-hint">Setting a cover image adds +25 to SEO and promotion scores.</p>
-
-          <div data-cover-preview-target="preview" class="mt-3 hidden">
-            <img data-cover-preview-target="image" data-image-upload-target="image"
-                 src="<%= @blog.cover_image_url %>"
-                 alt="Cover preview"
-                 class="w-full h-48 object-cover rounded-xl border border-gray-200 dark:border-gray-700">
-          </div>
-        </div>
+        <% end %>
 
         <!-- SEO fields -->
         <div class="card p-5 space-y-4">
