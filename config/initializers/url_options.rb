@@ -4,7 +4,7 @@
 Rails.application.config.after_initialize do
   options =
     if Rails.env.production?
-      { host: ENV.fetch("APP_HOST", "example.com") }
+      { host: ENV.fetch("APP_HOST", "parna.onrender.com") }
     else
       # `*.localhost` resolves to 127.0.0.1 in modern browsers (no DNS needed),
       # so per-user subdomains work offline: <username>.localhost:3002.

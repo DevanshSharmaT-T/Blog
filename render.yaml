@@ -17,11 +17,14 @@ services:
     branch: main             # branch to deploy from — change to "Deployment" if that's the one
     healthCheckPath: /up
     autoDeploy: true
+    # Run Puma directly on $PORT (Render sets PORT=10000) instead of the image's default
+    # Thruster wrapper. Behind Render's TLS-terminating edge, Thruster is redundant, and its
+    # localhost proxy resolves to IPv6 [::1] while Puma binds IPv4 0.0.0.0 -> every request 502s.
+    # (The entrypoint still runs db:prepare because the command ends in `bin/rails server`.)
+    dockerCommand: ./bin/rails server
     envVars:
       - key: RAILS_MASTER_KEY
         sync: false           # set the value in the Render dashboard; never commit it
-      - key: HTTP_PORT
-        value: "10000"        # Thruster listens here = Render's routed PORT (default 10000)
       - key: SOLID_QUEUE_IN_PUMA
         value: "true"         # run Solid Queue jobs (config/recurring.yml) inside Puma
       - key: RAILS_MAX_THREADS
