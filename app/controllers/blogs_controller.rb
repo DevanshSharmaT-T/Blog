@@ -170,11 +170,13 @@ class BlogsController < ApplicationController
 
   def set_blog
     @blog = if action_name == "show"
-              # Public posts are served from the author's sub-host: <username>.<apex>/blog/<slug>.
-              # Derive the username by stripping the apex host suffix (host-suffix routing,
-              # not tld_length-based subdomain parsing). Visibility/preview enforced in #show.
-              apex     = Rails.application.routes.default_url_options[:host].to_s
-              username = request.host.to_s.delete_suffix(".#{apex}")
+              # Public posts: /@<username>/blog/<slug>. Visibility/preview enforced in #show.
+              #
+              # ── PATH-BASED MODE (active) ── author from the :username path segment:
+              username = params[:username]
+              # ── SUBDOMAIN MODE (disabled) ── derive author from the apex host-suffix:
+              # apex     = Rails.application.routes.default_url_options[:host].to_s
+              # username = request.host.to_s.delete_suffix(".#{apex}")
               author   = User.find_by!(username: username)
               author.blogs.not_deleted.includes(:template, :author, :topics).find_by!(slug: params[:slug])
             else

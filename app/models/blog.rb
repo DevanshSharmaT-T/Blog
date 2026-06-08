@@ -79,13 +79,20 @@ class Blog < ApplicationRecord
     update!(status: :review)
   end
 
-  # Canonical public URL on the author's sub-host: <username>.<apex>/blog/<slug>.
+  # Canonical public URL: /@<username>/blog/<slug> on the configured apex host.
+  #
+  # ── PATH-BASED MODE (active) ──────────────────────────────────────────────────
   def public_url
-    opts = Rails.application.routes.default_url_options
-    Rails.application.routes.url_helpers.public_blog_url(
-      slug: slug, host: "#{author.username}.#{opts[:host]}", port: opts[:port]
-    )
+    Rails.application.routes.url_helpers.public_blog_url(username: author.username, slug: slug)
   end
+  #
+  # ── SUBDOMAIN MODE (disabled) ── requires a wildcard domain; see config/routes.rb.
+  # def public_url
+  #   opts = Rails.application.routes.default_url_options
+  #   Rails.application.routes.url_helpers.public_blog_url(
+  #     slug: slug, host: "#{author.username}.#{opts[:host]}", port: opts[:port]
+  #   )
+  # end
 
   # Rich payload for the `blog.published` webhook so connected automations
   # (Zapier/Make/n8n, etc.) have everything needed to announce the post.

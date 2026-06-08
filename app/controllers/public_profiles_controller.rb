@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Public author profile, served from the author's sub-host (<username>.<apex>/about).
-# The author is derived from the host suffix, mirroring BlogsController#set_blog.
+# Public author profile, served at /@<username> (path-based; see config/routes.rb).
+# The author is derived from the :username path segment, mirroring BlogsController#set_blog.
 class PublicProfilesController < ApplicationController
   include Pagy::Backend
 
@@ -9,7 +9,10 @@ class PublicProfilesController < ApplicationController
 
   def show
     apex     = Rails.application.routes.default_url_options[:host].to_s
-    username = request.host.to_s.delete_suffix(".#{apex}")
+    # ── PATH-BASED MODE (active) ── author from the /@:username path segment:
+    username = params[:username]
+    # ── SUBDOMAIN MODE (disabled) ── derive author from the apex host-suffix:
+    # username = request.host.to_s.delete_suffix(".#{apex}")
     @author  = User.active.find_by!(username: username)
 
     @pagy, @blogs = pagy(

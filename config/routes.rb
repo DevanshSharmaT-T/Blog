@@ -14,20 +14,32 @@ Rails.application.routes.draw do
   get "blog/feed",      to: "blogs#feed",    as: :blog_feed, defaults: { format: :atom }
   get "sitemap.xml",    to: "sitemaps#show", defaults: { format: :xml }, as: :sitemap
 
-  # Public blog posts live on the author's sub-host: <username>.<apex>/blog/<slug>
-  # (declared after /blog and /blog/feed so those apex routes win on any host).
-  # Match by host-suffix against the configured apex rather than ActionDispatch's
-  # subdomain parsing, which depends on tld_length and fails for `*.localhost`.
-  blog_host_constraint = lambda do |request|
-    apex = Rails.application.routes.default_url_options[:host].to_s
-    host = request.host.to_s
-    apex.present? && host != apex && host.end_with?(".#{apex}")
-  end
-  constraints(blog_host_constraint) do
-    get "blog/:slug", to: "blogs#show", as: :public_blog
-    # Public author profile — the author is derived from the sub-host.
-    get "about", to: "public_profiles#show", as: :public_profile
-  end
+  # Public blog posts & author profiles live under the author's handle.
+  #
+  # ── PATH-BASED MODE (active) ──────────────────────────────────────────────────
+  # /@<username>/blog/<slug> and /@<username>. Served on a single host (works on the
+  # free *.onrender.com domain — no wildcard TLS/DNS needed). The author comes from
+  # the :username path segment (see BlogsController#set_blog & PublicProfilesController).
+  # The `@` prefix guarantees these never collide with other top-level routes.
+  get "@:username/blog/:slug", to: "blogs#show",           as: :public_blog,    constraints: { username: /[a-z0-9][a-z0-9-]*/ }
+  get "@:username",            to: "public_profiles#show", as: :public_profile, constraints: { username: /[a-z0-9][a-z0-9-]*/ }
+  #
+  # ── SUBDOMAIN MODE (disabled) ─────────────────────────────────────────────────
+  # Per-author sub-hosts: <username>.<apex>/blog/<slug> and <username>.<apex>/about.
+  # Requires a wildcard custom domain (*.yourdomain.com) with wildcard TLS — NOT
+  # possible on a free *.onrender.com host. To re-enable: uncomment this block, remove
+  # the two path-based routes above, and revert the matching builders/controllers
+  # (grep "SUBDOMAIN MODE"). Matches by host-suffix against the configured apex (not
+  # tld_length-based subdomain parsing, which fails for `*.localhost`).
+  # blog_host_constraint = lambda do |request|
+  #   apex = Rails.application.routes.default_url_options[:host].to_s
+  #   host = request.host.to_s
+  #   apex.present? && host != apex && host.end_with?(".#{apex}")
+  # end
+  # constraints(blog_host_constraint) do
+  #   get "blog/:slug", to: "blogs#show", as: :public_blog
+  #   get "about", to: "public_profiles#show", as: :public_profile
+  # end
   # `new` must be declared before the `:show` route below, otherwise `/topics/new`
   # is captured by `/topics/:id` (id="new"). Auth is enforced in TopicsController.
   get "topics/new",     to: "topics#new", as: :new_topic

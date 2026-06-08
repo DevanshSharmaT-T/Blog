@@ -28,12 +28,15 @@ production:
     database: <%= Rails.application.credentials.dig(:database, :database) %>
     username: <%= Rails.application.credentials.dig(:database, :username) %>
     password: <%= Rails.application.credentials.dig(:database, :password) %>
+  # cache/queue/cable are extra connections to the SAME physical database as primary.
+  # database_tasks: false tells Rails not to manage their schema separately — the Solid
+  # tables are created by the primary migration (db/migrate) and live in the shared DB.
   cache:
     <<: *primary_production
-    migrations_paths: db/cache_migrate
+    database_tasks: false
   queue:
     <<: *primary_production
-    migrations_paths: db/queue_migrate
+    database_tasks: false
   cable:
     <<: *primary_production
-    migrations_paths: db/cable_migrate
+    database_tasks: false
