@@ -24,7 +24,7 @@ puts "  ✅ Owner: #{owner.email}"
   u = User.find_or_initialize_by(email: attrs[:email])
   u.assign_attributes(
     name: attrs[:name], role: attrs[:role],
-    password: Rails.application.credentials.dig.password(:password), password_confirmation: Rails.application.credentials.password(:password),
+    password: Rails.application.credentials.password[:password], password_confirmation: Rails.application.credentials.password[:password],
     is_active: true, confirmed_at: Time.current, email_verified_at: Time.current
   )
   u.save!

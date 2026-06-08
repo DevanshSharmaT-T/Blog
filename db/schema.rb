@@ -61,7 +61,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_29_000002) do
     t.datetime "assigned_at", default: -> { "now()" }, null: false
     t.uuid "blog_id", null: false
     t.uuid "topic_id", null: false
-    t.index ["blog_id", "topic_id"], name: "blog_topics_pkey", unique: true
     t.index ["blog_id"], name: "index_blog_topics_on_blog_id"
     t.index ["topic_id"], name: "index_blog_topics_on_topic_id"
   end

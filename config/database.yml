@@ -21,18 +21,19 @@ test:
   password: <%= ENV.fetch("DB_PASSWORD") { "" } %>
 
 production:
-  primary:
+  primary: &primary_production
     <<: *default
-    url: <%= ENV["DATABASE_URL"] %>
+    host: <%= Rails.application.credentials.dig(:database, :hostname) %>
+    port: <%= Rails.application.credentials.dig(:database, :port) %>
+    database: <%= Rails.application.credentials.dig(:database, :database) %>
+    username: <%= Rails.application.credentials.dig(:database, :username) %>
+    password: <%= Rails.application.credentials.dig(:database, :password) %>
   cache:
-    <<: *default
-    url: <%= ENV["DATABASE_CACHE_URL"] %>
+    <<: *primary_production
     migrations_paths: db/cache_migrate
   queue:
-    <<: *default
-    url: <%= ENV["DATABASE_QUEUE_URL"] %>
+    <<: *primary_production
     migrations_paths: db/queue_migrate
   cable:
-    <<: *default
-    url: <%= ENV["DATABASE_CABLE_URL"] %>
+    <<: *primary_production
     migrations_paths: db/cable_migrate
