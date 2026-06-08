@@ -207,7 +207,7 @@ end
 puts "  📦 #{Template.active.count} templates active."
 
 # ─── 6. Sample blog post ──────────────────────────────────────────────────────
-writer = User.find_by!(email: "writer@myblog.dev")
+writer = User.find_by!(email: "writer@myblog.dev") unless Rails.env.production?
 unless Blog.exists?(slug: "getting-started-with-myblog")
   blog = Blog.create!(
     author: writer,
