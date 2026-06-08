@@ -115,3 +115,5 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+gem "imagekitio", "~> 4.6"
