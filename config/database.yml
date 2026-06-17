@@ -21,18 +21,22 @@ test:
   password: <%= ENV.fetch("DB_PASSWORD") { "" } %>
 
 production:
-  primary:
+  primary: &primary_production
     <<: *default
-    url: <%= ENV["DATABASE_URL"] %>
+    host: <%= Rails.application.credentials.dig(:database, :hostname) %>
+    port: <%= Rails.application.credentials.dig(:database, :port) %>
+    database: <%= Rails.application.credentials.dig(:database, :database) %>
+    username: <%= Rails.application.credentials.dig(:database, :username) %>
+    password: <%= Rails.application.credentials.dig(:database, :password) %>
+  # cache/queue/cable are extra connections to the SAME physical database as primary.
+  # database_tasks: false tells Rails not to manage their schema separately — the Solid
+  # tables are created by the primary migration (db/migrate) and live in the shared DB.
   cache:
-    <<: *default
-    url: <%= ENV["DATABASE_CACHE_URL"] %>
-    migrations_paths: db/cache_migrate
+    <<: *primary_production
+    database_tasks: false
   queue:
-    <<: *default
-    url: <%= ENV["DATABASE_QUEUE_URL"] %>
-    migrations_paths: db/queue_migrate
+    <<: *primary_production
+    database_tasks: false
   cable:
-    <<: *default
-    url: <%= ENV["DATABASE_CABLE_URL"] %>
-    migrations_paths: db/cable_migrate
+    <<: *primary_production
+    database_tasks: false

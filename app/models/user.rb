@@ -28,15 +28,16 @@ class User < ApplicationRecord
   has_many :created_templates,       class_name: "Template",       foreign_key: :created_by_id, dependent: :nullify
 
   # ─── Validations ─────────────────────────────────────────────────────────────
-  validates :name,  presence: true, length: { maximum: 120 }
-  validates :email, presence: true, uniqueness: { case_sensitive: false }
+  validates :name,  presence: true, length: { maximum: 120 }, banned_words: true
+  validates :email, presence: true, uniqueness: { case_sensitive: false }, disposable_email: true
   validates :role,  presence: true
 
   validates :username, presence: true, length: { in: 2..50 },
                        format: { with: /\A[a-z0-9][a-z0-9-]*\z/,
                                  message: "may only contain lowercase letters, numbers, and hyphens" },
                        uniqueness: { case_sensitive: false },
-                       exclusion: { in: RESERVED_USERNAMES, message: "is reserved" }
+                       exclusion: { in: RESERVED_USERNAMES, message: "is reserved" },
+                       banned_words: true
 
   validates :website_url, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]), allow_blank: true }
 
@@ -47,6 +48,8 @@ class User < ApplicationRecord
   # ─── Scopes ───────────────────────────────────────────────────────────────────
   scope :active,    -> { where(deleted_at: nil, is_active: true) }
   scope :not_deleted, -> { where(deleted_at: nil) }
+  scope :deleted,    -> { where.not(deleted_at: nil) }
+  scope :unverified, -> { where(confirmed_at: nil) }
 
   # ─── Callbacks ───────────────────────────────────────────────────────────────
   before_save :sync_email_verified_at
@@ -56,8 +59,28 @@ class User < ApplicationRecord
     update!(deleted_at: Time.current, is_active: false)
   end
 
+  # Undo a soft delete and re-enable sign-in.
+  def restore!
+    update!(deleted_at: nil, is_active: true)
+  end
+
   def deleted?
     deleted_at.present?
+  end
+
+  # Email-confirmation (Devise :confirmable) state, managed by admins from the
+  # user list. `sync_email_verified_at` mirrors confirmed_at into email_verified_at
+  # on set; unverify clears both explicitly since that callback never clears.
+  def verified?
+    confirmed_at.present?
+  end
+
+  def verify!
+    update!(confirmed_at: Time.current)
+  end
+
+  def unverify!
+    update!(confirmed_at: nil, email_verified_at: nil)
   end
 
   def active_for_authentication?
@@ -75,6 +98,12 @@ class User < ApplicationRecord
 
   def inactive_message
     deleted? ? :deleted_account : super
+  end
+
+  # Send Devise emails (confirmation, reset, etc.) via Active Job / Solid Queue so a
+  # slow or unreachable SMTP server can never 500 the originating request.
+  def send_devise_notification(notification, *args)
+    devise_mailer.send(notification, self, *args).deliver_later
   end
 
   # ─── Ransack ─────────────────────────────────────────────────────────────────

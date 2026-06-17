@@ -24,6 +24,14 @@
               ),
               {}, class: "form-input" %>
       </div>
+      <div class="w-44 shrink-0">
+        <%= select_tag :status,
+              options_for_select(
+                [["Active accounts", ""], ["Unverified", "unverified"], ["Deleted", "deleted"]],
+                params[:status]
+              ),
+              class: "form-input" %>
+      </div>
       <%= s.submit "Filter", class: "btn btn-secondary shrink-0" %>
     </div>
   <% end %>
@@ -65,11 +73,20 @@
               </span>
             </td>
             <td class="px-4 py-3">
-              <% if user.is_active %>
-                <span class="text-emerald-400 text-xs">● Active</span>
-              <% else %>
-                <span class="text-gray-500 text-xs">● Inactive</span>
-              <% end %>
+              <div class="flex flex-col gap-1 items-start">
+                <% if user.deleted? %>
+                  <span class="badge badge-error">Deleted</span>
+                <% elsif user.is_active %>
+                  <span class="text-emerald-400 text-xs">● Active</span>
+                <% else %>
+                  <span class="text-gray-500 text-xs">● Inactive</span>
+                <% end %>
+                <% if user.verified? %>
+                  <span class="badge badge-active">Verified</span>
+                <% else %>
+                  <span class="badge badge-inactive">Unverified</span>
+                <% end %>
+              </div>
             </td>
             <td class="px-4 py-3 text-xs text-gray-600 dark:text-gray-400">
               <%= user.last_login_at ? time_ago_in_words(user.last_login_at) + " ago" : "—" %>
@@ -78,8 +95,10 @@
               <%= user.created_at.strftime("%b %d, %Y") %>
             </td>
             <td class="px-4 py-3 text-right">
+              <%# Self-rows and (for non-owners) owner-rows can't be managed — mirrors guard_target! %>
+              <% manageable = user != current_user && (current_user.owner_role? || !user.owner_role?) %>
               <div class="inline-flex items-center gap-2">
-                <% if can?(:change_role, user) && user != current_user %>
+                <% if manageable && can?(:change_role, user) %>
                   <%= form_with url: change_role_user_path(user), method: :patch, local: true, class: "inline" do |fr| %>
                     <%= fr.select :role,
                           options_for_select(
@@ -92,20 +111,57 @@
                   <% end %>
                 <% end %>
 
-                <% if can?(:toggle_active, user) && user != current_user %>
-                  <%= button_to toggle_active_user_path(user), method: :patch,
-                        class: "btn btn-secondary text-xs py-1 px-2",
-                        title: (user.is_active ? "Deactivate" : "Activate") do %>
-                    <%= user.is_active ? "Deactivate" : "Activate" %>
-                  <% end %>
-                <% end %>
+                <% show_menu = manageable && (user.deleted? ? can?(:restore, user) : true) %>
+                <% if show_menu %>
+                  <div class="relative inline-block text-left" data-controller="dropdown">
+                    <button type="button"
+                            class="btn btn-secondary text-xs py-1 px-2"
+                            data-action="dropdown#toggle"
+                            aria-haspopup="true" aria-label="User actions">
+                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+                      </svg>
+                    </button>
+                    <div data-dropdown-target="menu" hidden
+                         class="absolute right-0 mt-1 w-52 z-20 origin-top-right rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg py-1 text-left">
+                      <% menu_item = "block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" %>
+                      <% danger_item = "block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10" %>
 
-                <% if can?(:destroy, user) && user != current_user %>
-                  <%= button_to user_path(user), method: :delete,
-                        data: { turbo_confirm: "Soft-delete this user? They will be unable to sign in." },
-                        class: "btn btn-secondary text-xs py-1 px-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300" do %>
-                    Delete
-                  <% end %>
+                      <% unless user.deleted? %>
+                        <% if user.verified? %>
+                          <% if can?(:unverify, user) %>
+                            <%= button_to "Mark unverified", unverify_user_path(user), method: :patch, class: menu_item %>
+                          <% end %>
+                        <% else %>
+                          <% if can?(:verify, user) %>
+                            <%= button_to "Mark verified", verify_user_path(user), method: :patch, class: menu_item %>
+                          <% end %>
+                          <% if can?(:resend_confirmation, user) %>
+                            <%= button_to "Resend confirmation", resend_confirmation_user_path(user), method: :post, class: menu_item %>
+                          <% end %>
+                        <% end %>
+
+                        <% if can?(:send_password_reset, user) %>
+                          <%= button_to "Send password reset", send_password_reset_user_path(user), method: :post, class: menu_item %>
+                        <% end %>
+
+                        <% if can?(:toggle_active, user) %>
+                          <%= button_to (user.is_active ? "Deactivate" : "Activate"),
+                                toggle_active_user_path(user), method: :patch, class: menu_item %>
+                        <% end %>
+
+                        <% if can?(:destroy, user) %>
+                          <%= button_to "Delete", user_path(user), method: :delete,
+                                data: { turbo_confirm: "Soft-delete this user? They will be unable to sign in." },
+                                class: danger_item %>
+                        <% end %>
+                      <% else %>
+                        <% if can?(:restore, user) %>
+                          <%= button_to "Restore", restore_user_path(user), method: :patch, class: menu_item %>
+                        <% end %>
+                      <% end %>
+                    </div>
+                  </div>
                 <% end %>
               </div>
             </td>

@@ -7,6 +7,16 @@ module Api
 
       before_action :authenticate_api_user!
 
+      # Registered FIRST so the specific rescues below take precedence (Rails matches
+      # the last-registered handler). Last-resort: clean JSON 500 instead of a blank/
+      # HTML response. Re-raised in dev/test so real errors stay visible.
+      rescue_from StandardError do |e|
+        raise e if Rails.env.local?
+
+        Rails.logger.error("[API Unhandled] #{e.class}: #{e.message}")
+        render json: { error: "Internal Server Error" }, status: :internal_server_error
+      end
+
       rescue_from CanCan::AccessDenied do |e|
         render json: { error: "Forbidden", message: e.message }, status: :forbidden
       end

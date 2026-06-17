@@ -3,12 +3,12 @@
 puts "🌱 Seeding database..."
 
 # ─── 1. Owner user ────────────────────────────────────────────────────────────
-owner = User.find_or_initialize_by(email: ENV.fetch("OWNER_EMAIL", "owner@myblog.dev"))
+owner = User.find_or_initialize_by(email: ENV.fetch("OWNER_EMAIL", "sharmadevansh795@gmail.com"))
 owner.assign_attributes(
-  name:     ENV.fetch("OWNER_NAME", "Blog Owner"),
+  name:     ENV.fetch("OWNER_NAME", "Devansh Sharma"),
   role:     :owner,
-  password: ENV.fetch("OWNER_PASSWORD", "Password1!"),
-  password_confirmation: ENV.fetch("OWNER_PASSWORD", "Password1!"),
+  password: Rails.application.credentials.password[:password],
+  password_confirmation: Rails.application.credentials.password[:password],
   is_active: true,
   confirmed_at: Time.current,
   email_verified_at: Time.current
@@ -18,13 +18,12 @@ puts "  ✅ Owner: #{owner.email}"
 
 # ─── 2. Sample users ──────────────────────────────────────────────────────────
 [
-  { name: "Alice Admin", email: "admin@myblog.dev", role: :admin },
-  { name: "Bob Writer",  email: "writer@myblog.dev", role: :user }
+  { name: "Devansh Sharma Dev",  email: "devanshsharma76823@gmail.com", role: :admin }
 ].each do |attrs|
   u = User.find_or_initialize_by(email: attrs[:email])
   u.assign_attributes(
     name: attrs[:name], role: attrs[:role],
-    password: "Password1!", password_confirmation: "Password1!",
+    password: Rails.application.credentials.password[:password], password_confirmation: Rails.application.credentials.password[:password],
     is_active: true, confirmed_at: Time.current, email_verified_at: Time.current
   )
   u.save!
@@ -207,7 +206,7 @@ end
 puts "  📦 #{Template.active.count} templates active."
 
 # ─── 6. Sample blog post ──────────────────────────────────────────────────────
-writer = User.find_by!(email: "writer@myblog.dev")
+writer = User.find_by!(email: "writer@myblog.dev") unless Rails.env.production?
 unless Blog.exists?(slug: "getting-started-with-myblog")
   blog = Blog.create!(
     author: writer,
@@ -267,4 +266,4 @@ unless Blog.exists?(slug: "getting-started-with-myblog")
 end
 
 puts "\n✨ Seeding complete!"
-puts "   Owner login: #{ENV.fetch('OWNER_EMAIL', 'owner@myblog.dev')} / #{ENV.fetch('OWNER_PASSWORD', 'Password1!')}"
+puts "   Owner login: #{ENV.fetch('OWNER_EMAIL', 'sharmadevansh795@gmail.com')}"

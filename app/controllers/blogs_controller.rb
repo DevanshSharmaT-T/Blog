@@ -5,7 +5,7 @@ class BlogsController < ApplicationController
 
   skip_before_action :authenticate_user!, only: [ :index, :show, :listing, :feed ]
 
-  before_action :set_blog, only: [ :show, :edit, :update, :destroy, :publish, :archive, :submit_review, :schedule ]
+  before_action :set_blog, only: [ :show, :edit, :update, :destroy, :publish, :archive, :submit_review, :schedule, :approve_moderation, :reject_moderation ]
   before_action :authorize_blog!, only: [ :edit, :update, :destroy, :publish, :archive, :submit_review, :schedule ]
 
   # GET /blog/:slug (public)
@@ -149,6 +149,30 @@ class BlogsController < ApplicationController
     end
   end
 
+  # GET /blogs/moderation_queue (admins/owners) — posts flagged for banned content
+  def moderation_queue
+    authorize! :moderate, Blog
+    @pagy, @blogs = pagy(
+      Blog.not_deleted.flagged.includes(:author).order(updated_at: :desc)
+    )
+  end
+
+  # PATCH /blogs/:id/approve_moderation (admins/owners)
+  def approve_moderation
+    authorize! :moderate, @blog
+    @blog.approve_moderation!(by: current_user, note: params[:moderation_note])
+    redirect_to moderation_queue_blogs_path,
+                notice: "\"#{@blog.title}\" approved. The author can now publish it."
+  end
+
+  # PATCH /blogs/:id/reject_moderation (admins/owners)
+  def reject_moderation
+    authorize! :moderate, @blog
+    @blog.reject_moderation!(by: current_user, note: params[:moderation_note])
+    redirect_to moderation_queue_blogs_path,
+                notice: "\"#{@blog.title}\" returned to its author."
+  end
+
   # POST /blogs/bulk_action
   def bulk_action
     blog_ids = params[:blog_ids] || []
@@ -170,11 +194,13 @@ class BlogsController < ApplicationController
 
   def set_blog
     @blog = if action_name == "show"
-              # Public posts are served from the author's sub-host: <username>.<apex>/blog/<slug>.
-              # Derive the username by stripping the apex host suffix (host-suffix routing,
-              # not tld_length-based subdomain parsing). Visibility/preview enforced in #show.
-              apex     = Rails.application.routes.default_url_options[:host].to_s
-              username = request.host.to_s.delete_suffix(".#{apex}")
+              # Public posts: /@<username>/blog/<slug>. Visibility/preview enforced in #show.
+              #
+              # ── PATH-BASED MODE (active) ── author from the :username path segment:
+              username = params[:username]
+              # ── SUBDOMAIN MODE (disabled) ── derive author from the apex host-suffix:
+              # apex     = Rails.application.routes.default_url_options[:host].to_s
+              # username = request.host.to_s.delete_suffix(".#{apex}")
               author   = User.find_by!(username: username)
               author.blogs.not_deleted.includes(:template, :author, :topics).find_by!(slug: params[:slug])
             else
@@ -191,7 +217,8 @@ class BlogsController < ApplicationController
   def blog_params
     params.require(:blog).permit(
       :title, :slug, :excerpt, :content, :content_format,
-      :cover_image_url, :seo_title, :seo_description,
+      :cover_image_url, :cover_focal_x, :cover_focal_y,
+      :seo_title, :seo_description,
       :template_id, :featured, :allow_comments
     )
   end

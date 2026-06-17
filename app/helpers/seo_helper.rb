@@ -31,22 +31,33 @@ module SeoHelper
     absolute_url(img)
   end
 
-  # Canonical public URL for a blog, on its author's sub-host:
-  # <username>.<apex>/blog/<slug>. Build the host explicitly (not via the
-  # `subdomain:` option, which breaks on single-label hosts like `localhost`),
-  # so links are correct regardless of the host the visitor is currently on.
+  # Canonical public URL for a blog: /@<username>/blog/<slug> on the current host.
+  #
+  # ── PATH-BASED MODE (active) ──────────────────────────────────────────────────
   def public_blog_url_for(blog)
-    opts = Rails.application.routes.default_url_options
-    public_blog_url(slug: blog.slug, host: "#{blog.author.username}.#{opts[:host]}", port: opts[:port])
+    public_blog_url(username: blog.author.username, slug: blog.slug)
   end
+  #
+  # ── SUBDOMAIN MODE (disabled) ── requires a wildcard domain; see config/routes.rb.
+  # Built the host explicitly (not via `subdomain:`, which breaks on single-label
+  # hosts like `localhost`) so links resolved regardless of the visitor's host.
+  # def public_blog_url_for(blog)
+  #   opts = Rails.application.routes.default_url_options
+  #   public_blog_url(slug: blog.slug, host: "#{blog.author.username}.#{opts[:host]}", port: opts[:port])
+  # end
 
-  # Public author profile, served from the author's sub-host: <username>.<apex>/about.
-  # Built the same way as public_blog_url_for so links resolve regardless of the
-  # host the visitor is currently on.
+  # Public author profile: /@<username> on the current host.
+  #
+  # ── PATH-BASED MODE (active) ──────────────────────────────────────────────────
   def public_profile_url_for(user)
-    opts = Rails.application.routes.default_url_options
-    public_profile_url(host: "#{user.username}.#{opts[:host]}", port: opts[:port])
+    public_profile_url(username: user.username)
   end
+  #
+  # ── SUBDOMAIN MODE (disabled) ── requires a wildcard domain; see config/routes.rb.
+  # def public_profile_url_for(user)
+  #   opts = Rails.application.routes.default_url_options
+  #   public_profile_url(host: "#{user.username}.#{opts[:host]}", port: opts[:port])
+  # end
 
   # Make a possibly-relative path (e.g. a dev-local "/uploads/..") absolute so
   # crawlers and social cards always receive a full URL.

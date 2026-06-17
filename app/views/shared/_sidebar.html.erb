@@ -1,18 +1,21 @@
 <nav class="fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col z-40" aria-label="Main navigation">
   <!-- Brand -->
   <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-gray-800">
-    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-md shadow-violet-500/30">
+    <!-- <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-md shadow-violet-500/30">
       <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-    </div>
-    <%= link_to root_path, class: "public-header-brand" do %>
+    </div> -->
+    <%= link_to root_path, class: "public-header-brand pr-8" do %>
       <span class="pr-8 font-bold text-gray-900 dark:text-white text-lg tracking-tight">MyBlog</span>
     <% end %>
 
     <!-- Theme toggle + user profile at bottom -->
-    <div class="border-gray-200 dark:border-gray-800" data-controller="theme">
+    <div class="flex items-center gap-2 border-gray-200 dark:border-gray-800" data-controller="theme">
         <button type="button" class="theme-toggle" data-action="theme#toggle" aria-label="Toggle color theme">
           <svg class="icon-sun w-4 h-4"  fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
           <svg class="icon-moon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+        <button type="button" class="sidebar-toggle" data-action="sidebar#toggle" aria-label="Toggle sidebar">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
     </div>
   </div>
@@ -53,6 +56,15 @@
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
         Users
       <% end %>
+
+      <% flagged_count = Blog.not_deleted.flagged.count %>
+      <%= link_to moderation_queue_blogs_path, class: "nav-link #{action_name == 'moderation_queue' ? 'nav-link-active' : ''}", aria: { label: "Moderation" } do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        Moderation
+        <% if flagged_count > 0 %>
+          <span class="ml-auto inline-flex items-center justify-center min-w-5 h-5 px-1.5 text-xs font-semibold rounded-full bg-amber-500 text-white"><%= flagged_count %></span>
+        <% end %>
+      <% end %>
     <% end %>
 
     <p class="px-3 pt-4 pb-1 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase tracking-wider">Settings</p>
@@ -84,8 +96,8 @@
 
   <div class="border-t border-gray-200 dark:border-gray-800 px-3 py-4">
     <div class="flex items-center gap-3 px-3 py-2">
-      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-indigo-500 flex items-center justify-center text-white text-sm font-semibold shrink-0">
-        <%= current_user.name[0].upcase %>
+      <div class="shrink-0">
+        <%= render "shared/avatar", user: current_user, size: "sm" %>
       </div>
       <div class="flex-1 min-w-0">
         <p class="text-sm font-medium text-gray-900 dark:text-white truncate"><%= current_user.name %></p>

@@ -8,7 +8,10 @@
 </div>
 
 <div class="page-content">
-  <%= form_with model: @user, url: settings_profile_path, method: :patch, html: { class: "space-y-5" } do |f| %>
+  <%= form_with model: @user, url: settings_profile_path, method: :patch,
+        html: { class: "space-y-5",
+                data: { controller: "field-validator",
+                        field_validator_url_value: moderation_check_path } } do |f| %>
 
     <% if @user.errors.any? %>
       <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-4" role="alert">
@@ -57,14 +60,20 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="form-group">
           <%= f.label :name, class: "form-label" %>
-          <%= f.text_field :name, class: "form-input", required: true, maxlength: 120 %>
+          <%= f.text_field :name, class: "form-input", required: true, maxlength: 120,
+              data: { field_validator_target: "input", field_validator_kind: "text",
+                      action: "input->field-validator#check blur->field-validator#check" } %>
+          <p class="form-error hidden"></p>
         </div>
 
         <div class="form-group">
           <%= f.label :username, class: "form-label" %>
           <%= f.text_field :username, class: "form-input font-mono", required: true, maxlength: 50,
-              pattern: "[a-z0-9][a-z0-9-]*", title: "Lowercase letters, numbers, and hyphens only" %>
-          <p class="form-hint">Your public blog lives at <code class="text-violet-600 dark:text-violet-400"><%= @user.username %>.<%= request.domain || "myblog" %><%= request.port == 80 || request.port == 443 ? "" : ":#{request.port}" %>/blog/…</code></p>
+              pattern: "[a-z0-9][a-z0-9-]*", title: "Lowercase letters, numbers, and hyphens only",
+              data: { field_validator_target: "input", field_validator_kind: "text",
+                      action: "input->field-validator#check blur->field-validator#check" } %>
+          <p class="form-error hidden"></p>
+          <p class="form-hint">Your public blog lives at <code class="text-violet-600 dark:text-violet-400"><%= request.host_with_port %>/@<%= @user.username %>/blog/…</code></p>
         </div>
       </div>
 
@@ -87,7 +96,10 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="form-group">
           <!--<%= f.label :email, class: "form-label" %>-->
-          <%= f.email_field :email, class: "form-input", value: @user.email %>
+          <%= f.email_field :email, class: "form-input", value: @user.email,
+              data: { field_validator_target: "input", field_validator_kind: "email",
+                      action: "input->field-validator#check blur->field-validator#check" } %>
+          <p class="form-error hidden"></p>
         </div>
 
         <div class="form-group">
@@ -121,7 +133,7 @@
         Role: <span class="text-gray-700 dark:text-gray-300 capitalize"><%= @user.role %></span> ·
         Joined <%= @user.created_at.strftime("%b %d, %Y") %>
       </p>
-      <%= f.submit "Save Profile", class: "btn btn-primary" %>
+      <%= f.submit "Save Profile", class: "btn btn-primary", data: { field_validator_target: "submit" } %>
     </div>
   <% end %>
 </div>

@@ -28,13 +28,17 @@ class Ability
   def admin_abilities(user)
     # Admin manages blogs and users — no billing/integrations/webhooks
     can :manage, Blog
+    can :moderate, Blog
     can :manage, Topic
     can :manage, Template
     can :read,   BlogAnalytic
     can :read,   SocialPlatform
 
-    # Users: read, update, toggle active, change role (owner-promotion blocked in controller)
-    can [ :index, :show, :update, :toggle_active, :change_role ], User
+    # Users: read, update, toggle active, change role, manage email verification,
+    # resend confirmation / password reset (owner-promotion blocked in controller).
+    # Delete + restore stay owner-only (default-deny covers :restore).
+    can [ :index, :show, :update, :toggle_active, :change_role,
+          :verify, :unverify, :resend_confirmation, :send_password_reset ], User
     cannot :destroy, User
 
     # Own profile
