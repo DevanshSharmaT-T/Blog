@@ -1,0 +1,62 @@
+# Curated banned / sensitive word lists used by ContentModeration.
+#
+# These are matched case-insensitively on WORD BOUNDARIES, so an entry like
+# "ass" will NOT match inside "class" or "passage". Multi-word entries (e.g.
+# "heil hitler") are matched as phrases. Keep entries lowercase.
+#
+# Categories are informational only (surfaced to admins for context) — every
+# category is enforced identically. Edit this file to tune the policy; it is
+# loaded once and memoized, so a server restart is required to pick up changes.
+#
+# NOTE: This is a deliberately conservative seed list. Expand it for your
+# audience. It is a first line of defence, NOT a replacement for human review —
+# which is exactly why blog content is routed to an admin review flow rather
+# than hard-blocked.
+
+# Explicit / profane language.
+profanity:
+  - fuck
+  - fucker
+  - fucking
+  - motherfucker
+  - shit
+  - bullshit
+  - bitch
+  - bastard
+  - asshole
+  - dickhead
+  - cunt
+  - prick
+  - wanker
+  - jackass
+
+# Slurs and hateful epithets (intentionally partial — extend for your locale).
+slurs:
+  - nigger
+  - nigga
+  - faggot
+  - retard
+  - tranny
+  - chink
+  - spic
+  - kike
+  - wetback
+
+# Sensitive / extremist content: glorification terms and figures. Because these
+# words can also appear in legitimate critical or educational writing, blog
+# content that matches is routed to admin REVIEW (not auto-rejected), while
+# usernames/display names containing them are blocked outright.
+sensitive:
+  - hitler
+  - heil hitler
+  - nazi
+  - neo-nazi
+  - white power
+  - white supremacy
+  - kkk
+  - ku klux klan
+  - jihad
+  - isis
+  - al-qaeda
+  - terrorist
+  - genocide

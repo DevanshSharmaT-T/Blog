@@ -1,0 +1,27 @@
+<%# Surfaces a blog's content-moderation state to its author inside the editor. %>
+<% if blog.persisted? && blog.moderation_flagged? %>
+  <div class="rounded-xl border border-amber-300/70 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-4" role="alert">
+    <div class="flex items-start gap-3">
+      <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <div>
+        <p class="text-sm font-medium text-amber-800 dark:text-amber-300">This post is flagged for review</p>
+        <p class="text-sm text-amber-700 dark:text-amber-400 mt-1">
+          It contains words that require moderation<% if blog.moderation_flagged_terms.present? %>
+            (<span class="font-mono"><%= blog.moderation_flagged_terms %></span>)<% end %>.
+          You can keep editing and save drafts, but it can't be published until an admin approves it.
+          Use <span class="font-medium">Submit for Review</span> on the Review step to request approval.
+        </p>
+      </div>
+    </div>
+  </div>
+<% elsif blog.persisted? && blog.moderation_approved? %>
+  <div class="rounded-xl border border-emerald-300/70 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 p-4" role="status">
+    <div class="flex items-center gap-3">
+      <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <p class="text-sm text-emerald-800 dark:text-emerald-300">
+        An admin reviewed and approved this post — you can publish it.
+        <% if blog.moderation_note.present? %><span class="text-emerald-700 dark:text-emerald-400">Note: <%= blog.moderation_note %></span><% end %>
+      </p>
+    </div>
+  </div>
+<% end %>

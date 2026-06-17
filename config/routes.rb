@@ -10,6 +10,10 @@ Rails.application.routes.draw do
 
   # ─── Public Routes ────────────────────────────────────────────────────────────
   root to: "pages#home"
+
+  # Interactive field validation (banned words / disposable email). Public so the
+  # signup form can call it before the visitor is authenticated.
+  post "moderation/check", to: "moderation_checks#create", as: :moderation_check
   get "blog",           to: "blogs#listing", as: :blog_archive
   get "blog/feed",      to: "blogs#feed",    as: :blog_feed, defaults: { format: :atom }
   get "sitemap.xml",    to: "sitemaps#show", defaults: { format: :xml }, as: :sitemap
@@ -61,9 +65,12 @@ Rails.application.routes.draw do
         patch :archive
         patch :submit_review
         post  :schedule
+        patch :approve_moderation
+        patch :reject_moderation
       end
       collection do
         post :bulk_action
+        get  :moderation_queue
       end
     end
 

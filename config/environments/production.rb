@@ -53,9 +53,12 @@ Rails.application.configure do
   config.active_job.queue_adapter = :solid_queue
   config.solid_queue.connects_to = { database: { writing: :queue } }
 
-  # Ignore bad email addresses and do not raise email delivery errors.
-  # Set this to true and configure the email server for immediate delivery to raise delivery errors.
-  # config.action_mailer.raise_delivery_errors = false
+  # Raise delivery errors so the background MailerDeliveryJob can see SMTP failures
+  # and retry them, instead of silently swallowing them.
+  config.action_mailer.raise_delivery_errors = true
+
+  # Route all outgoing mail (including Devise) through a retrying delivery job.
+  config.action_mailer.delivery_job = "MailerDeliveryJob"
 
   # Apex host used for absolute/subdomain blog URLs (set APP_HOST in prod, e.g. "myblog.com").
   app_host = ENV.fetch("APP_HOST", "parna.onrender.com")
@@ -71,11 +74,13 @@ Rails.application.configure do
   config.action_mailer.perform_deliveries = true
   config.action_mailer.smtp_settings = {
     address:              brevo[:SMTP_HOST] || ENV.fetch("SMTP_HOST", "smtp-relay.brevo.com"),
-    port:                 (brevo[:SMTP_PORT] || ENV.fetch("SMTP_PORT", 587)).to_i,
+    port:                 (brevo[:SMTP_PORT] || ENV.fetch("SMTP_PORT", 2525)).to_i,
     user_name:            brevo[:SMTP_USER] || ENV["SMTP_USER"],
     password:             brevo[:SMTP_PASS] || ENV["SMTP_PASS"],
     authentication:       :login,
-    enable_starttls_auto: true
+    enable_starttls_auto: true,
+    open_timeout:         5,
+    read_timeout:         5
   }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to

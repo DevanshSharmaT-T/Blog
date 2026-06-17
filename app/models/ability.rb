@@ -28,6 +28,7 @@ class Ability
   def admin_abilities(user)
     # Admin manages blogs and users — no billing/integrations/webhooks
     can :manage, Blog
+    can :moderate, Blog
     can :manage, Topic
     can :manage, Template
     can :read,   BlogAnalytic

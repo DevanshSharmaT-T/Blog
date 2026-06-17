@@ -12,9 +12,17 @@ class Blog < ApplicationRecord
 
   enum :content_format, { markdown: "markdown", html: "html" }, suffix: true
 
+  # Content moderation lifecycle (independent of the publishing `status`):
+  #   clean    — no banned/sensitive terms detected
+  #   flagged  — terms detected; cannot be published until an admin approves
+  #   approved — an admin reviewed and cleared it; publishes normally
+  enum :moderation_state, { clean: "clean", flagged: "flagged", approved: "approved" },
+       prefix: :moderation
+
   # ─── Associations ────────────────────────────────────────────────────────────
-  belongs_to :author,   class_name: "User", foreign_key: :author_id
-  belongs_to :template, optional: true
+  belongs_to :author,      class_name: "User", foreign_key: :author_id
+  belongs_to :template,    optional: true
+  belongs_to :moderated_by, class_name: "User", optional: true
 
   has_many :blog_topics,    dependent: :destroy
   has_many :topics,         through: :blog_topics
@@ -31,9 +39,11 @@ class Blog < ApplicationRecord
   validates :status,         presence: true
   validates :seo_title,      length: { maximum: 70 }, allow_blank: true
   validates :seo_description, length: { maximum: 160 }, allow_blank: true
+  validate  :flagged_content_cannot_go_public
 
   # ─── Callbacks ───────────────────────────────────────────────────────────────
   before_validation :generate_slug, if: -> { slug.blank? && title.present? }
+  before_validation :scan_for_banned_content
   before_save       :calculate_word_count
   before_save       :calculate_reading_time
   after_save        :run_scoring, if: :saved_change_to_content?
@@ -45,13 +55,14 @@ class Blog < ApplicationRecord
   scope :by_author,    ->(author) { where(author: author) }
   scope :recent,       -> { order(published_at: :desc) }
   scope :by_status,    ->(s) { where(status: s) }
+  scope :flagged,      -> { where(moderation_state: :flagged) }
 
   # ─── Ransack Allowlist ───────────────────────────────────────────────────────
   def self.ransackable_attributes(_auth_object = nil)
     %w[title slug status content excerpt seo_title seo_description
        word_count seo_score readability_score promotion_score
        featured allow_comments published_at created_at updated_at
-       author_id template_id]
+       author_id template_id moderation_state]
   end
 
   def self.ransackable_associations(_auth_object = nil)
@@ -77,6 +88,20 @@ class Blog < ApplicationRecord
 
   def submit_for_review!
     update!(status: :review)
+  end
+
+  # Admin action: clear a flagged blog so its author can publish it. Recorded
+  # for an audit trail. A later edit to the title/excerpt/content re-scans and
+  # may flag it again (see #scan_for_banned_content).
+  def approve_moderation!(by:, note: nil)
+    update!(moderation_state: :approved, moderated_by: by,
+            moderated_at: Time.current, moderation_note: note.presence)
+  end
+
+  # Admin action: send a flagged blog back to the author with an optional note.
+  def reject_moderation!(by:, note: nil)
+    update!(moderation_state: :flagged, status: :draft, moderated_by: by,
+            moderated_at: Time.current, moderation_note: note.presence)
   end
 
   # Canonical public URL: /@<username>/blog/<slug> on the configured apex host.
@@ -115,6 +140,40 @@ class Blog < ApplicationRecord
   end
 
   private
+
+  # Re-scan the user-authored fields whenever any of them change. Matches flag
+  # the blog (and reset a stale approval, since the content is now different);
+  # a clean edit clears the flag. Unchanged content leaves the state untouched
+  # so an admin's approval sticks across unrelated saves (e.g. publishing).
+  def scan_for_banned_content
+    return unless will_save_change_to_title? ||
+                  will_save_change_to_excerpt? ||
+                  will_save_change_to_content?
+
+    matches = ContentModeration.scan([ title, excerpt, content ].join("\n"))
+
+    if matches.any?
+      self.moderation_state = :flagged
+      self.moderation_flagged_terms = matches.join(", ")
+      self.moderated_by_id = nil
+      self.moderated_at    = nil
+    else
+      self.moderation_state = :clean
+      self.moderation_flagged_terms = nil
+    end
+  end
+
+  # A flagged blog must not become publicly visible. It can still be saved as a
+  # draft or submitted for review; an admin approval lifts this block.
+  def flagged_content_cannot_go_public
+    return unless moderation_flagged?
+    return unless published_status? || scheduled_status?
+
+    errors.add(:base,
+               "This post contains flagged content (#{moderation_flagged_terms}) and " \
+               "must be approved by an admin before it can be published. " \
+               "Submit it for review to request approval.")
+  end
 
   def generate_slug
     base = title.parameterize

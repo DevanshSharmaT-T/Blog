@@ -5,7 +5,7 @@ class BlogsController < ApplicationController
 
   skip_before_action :authenticate_user!, only: [ :index, :show, :listing, :feed ]
 
-  before_action :set_blog, only: [ :show, :edit, :update, :destroy, :publish, :archive, :submit_review, :schedule ]
+  before_action :set_blog, only: [ :show, :edit, :update, :destroy, :publish, :archive, :submit_review, :schedule, :approve_moderation, :reject_moderation ]
   before_action :authorize_blog!, only: [ :edit, :update, :destroy, :publish, :archive, :submit_review, :schedule ]
 
   # GET /blog/:slug (public)
@@ -147,6 +147,30 @@ class BlogsController < ApplicationController
     else
       redirect_to edit_blog_path(@blog, step: :review), alert: "Scheduled time must be in the future."
     end
+  end
+
+  # GET /blogs/moderation_queue (admins/owners) — posts flagged for banned content
+  def moderation_queue
+    authorize! :moderate, Blog
+    @pagy, @blogs = pagy(
+      Blog.not_deleted.flagged.includes(:author).order(updated_at: :desc)
+    )
+  end
+
+  # PATCH /blogs/:id/approve_moderation (admins/owners)
+  def approve_moderation
+    authorize! :moderate, @blog
+    @blog.approve_moderation!(by: current_user, note: params[:moderation_note])
+    redirect_to moderation_queue_blogs_path,
+                notice: "\"#{@blog.title}\" approved. The author can now publish it."
+  end
+
+  # PATCH /blogs/:id/reject_moderation (admins/owners)
+  def reject_moderation
+    authorize! :moderate, @blog
+    @blog.reject_moderation!(by: current_user, note: params[:moderation_note])
+    redirect_to moderation_queue_blogs_path,
+                notice: "\"#{@blog.title}\" returned to its author."
   end
 
   # POST /blogs/bulk_action

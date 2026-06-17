@@ -66,9 +66,13 @@
   <%= form_with model: @blog,
       url: @blog&.id ? blog_path(@blog) : blogs_path,
       method: @blog&.id ? :patch : :post,
-      html: { class: "space-y-6", id: "blog-form", data: { turbo: true } } do |f| %>
+      html: { class: "space-y-6", id: "blog-form",
+              data: { turbo: true, controller: "field-validator",
+                      field_validator_url_value: moderation_check_path } } do |f| %>
 
     <%= hidden_field_tag :step, current_step %>
+
+    <%= render "blogs/moderation_banner", blog: @blog %>
 
     <% if @blog&.errors&.any? %>
       <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-4" role="alert">
@@ -97,10 +101,13 @@
                 placeholder: "Enter a compelling title…",
                 maxlength: 255,
                 required: true,
-                data: { slug_target: "titleInput", action: "input->slug#titleChanged" } %>
+                data: { slug_target: "titleInput", field_validator_target: "input",
+                        field_validator_kind: "flaggable",
+                        action: "input->slug#titleChanged input->field-validator#check blur->field-validator#check" } %>
           <% if @blog.respond_to?(:slug) %>
             <%= f.hidden_field :slug, data: { slug_target: "slugInput", action: "input->slug#slugChanged" } %>
           <% end %>
+          <p class="form-error hidden"></p>
           <p class="form-hint">URL preview: <code class="text-violet-600 dark:text-violet-400">/blog/<span data-slug-target="preview">your-slug-here</span></code></p>
         </div>
 
@@ -149,7 +156,10 @@
         <!-- Excerpt -->
         <div class="card p-5 form-group">
           <%= f.label :excerpt, "Excerpt", class: "form-label" %>
-          <%= f.text_area :excerpt, class: "form-input", rows: 3, placeholder: "A short teaser shown in listings…", id: "blog_excerpt" %>
+          <%= f.text_area :excerpt, class: "form-input", rows: 3, placeholder: "A short teaser shown in listings…", id: "blog_excerpt",
+                data: { field_validator_target: "input", field_validator_kind: "flaggable",
+                        action: "input->field-validator#check blur->field-validator#check" } %>
+          <p class="form-error hidden"></p>
           <p class="form-hint">Setting an excerpt adds +25 to your promotion score</p>
         </div>
 
@@ -442,18 +452,28 @@
         <div class="card p-6 space-y-4">
           <h3 class="text-base font-semibold text-gray-900 dark:text-white">Publishing Options</h3>
           <div class="flex flex-wrap gap-3">
-            <%= button_to publish_blog_path(@blog), method: :patch, class: "btn btn-primary", aria: { label: "Publish now" } do %>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-              Publish Now
-            <% end %>
+            <% if @blog.moderation_flagged? %>
+              <%= button_to submit_review_blog_path(@blog), method: :patch, class: "btn btn-primary" do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Submit for Admin Review
+              <% end %>
+              <span class="text-xs text-amber-600 dark:text-amber-400 self-center">
+                Publishing is locked until an admin approves the flagged content.
+              </span>
+            <% else %>
+              <%= button_to publish_blog_path(@blog), method: :patch, class: "btn btn-primary", aria: { label: "Publish now" } do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Publish Now
+              <% end %>
 
-            <button type="button" onclick="document.getElementById('schedule-form').classList.toggle('hidden')" class="btn btn-secondary">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-              Schedule
-            </button>
+              <button type="button" onclick="document.getElementById('schedule-form').classList.toggle('hidden')" class="btn btn-secondary">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                Schedule
+              </button>
 
-            <%= button_to submit_review_blog_path(@blog), method: :patch, class: "btn btn-secondary" do %>
-              Submit for Review
+              <%= button_to submit_review_blog_path(@blog), method: :patch, class: "btn btn-secondary" do %>
+                Submit for Review
+              <% end %>
             <% end %>
           </div>
 

@@ -47,20 +47,25 @@
 
     <!-- App shell: public header for guests/reader pages; sidebar for authenticated dashboard. -->
     <% show_sidebar = sidebar_visible? %>
-    <div class="<%= show_sidebar ? 'flex h-full' : 'flex flex-col min-h-screen' %>">
-      <% if show_sidebar %>
+    <% if show_sidebar %>
+      <div class="flex h-full <%= 'sidebar-collapsed' if sidebar_collapsed? %>" data-controller="sidebar">
         <%= render "shared/sidebar" %>
         <main id="main-content" class="ml-64 flex-1 min-h-screen overflow-y-auto">
           <%= yield %>
         </main>
-      <% else %>
+        <button type="button" class="sidebar-reopen" data-action="sidebar#toggle" aria-label="Open sidebar">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    <% else %>
+      <div class="flex flex-col min-h-screen">
         <% unless devise_controller? %>
           <%= render "shared/public_header" %>
         <% end %>
         <main id="main-content" class="flex-1">
           <%= yield %>
         </main>
-      <% end %>
-    </div>
+      </div>
+    <% end %>
   </body>
 </html>

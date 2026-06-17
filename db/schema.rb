@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_08_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_17_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -75,6 +75,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_08_000001) do
     t.datetime "deleted_at"
     t.text "excerpt"
     t.boolean "featured", default: false, null: false
+    t.datetime "moderated_at"
+    t.uuid "moderated_by_id"
+    t.text "moderation_flagged_terms"
+    t.text "moderation_note"
+    t.string "moderation_state", default: "clean", null: false
     t.integer "promotion_score", limit: 2
     t.datetime "published_at"
     t.integer "readability_score", limit: 2
@@ -93,6 +98,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_08_000001) do
     t.index ["author_id"], name: "index_blogs_on_author_id"
     t.index ["deleted_at"], name: "index_blogs_on_deleted_at"
     t.index ["featured"], name: "index_blogs_on_featured"
+    t.index ["moderated_by_id"], name: "index_blogs_on_moderated_by_id"
+    t.index ["moderation_state"], name: "index_blogs_on_moderation_state"
     t.index ["published_at"], name: "index_blogs_on_published_at"
     t.index ["scheduled_at"], name: "index_blogs_on_scheduled_at"
     t.index ["status"], name: "index_blogs_on_status"
@@ -395,6 +402,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_08_000001) do
   add_foreign_key "blog_topics", "topics"
   add_foreign_key "blogs", "templates"
   add_foreign_key "blogs", "users", column: "author_id"
+  add_foreign_key "blogs", "users", column: "moderated_by_id"
   add_foreign_key "images", "blogs"
   add_foreign_key "images", "users", column: "uploaded_by_id"
   add_foreign_key "integration_events", "blogs"

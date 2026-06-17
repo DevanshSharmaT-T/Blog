@@ -15,6 +15,11 @@ module ApplicationHelper
     cookies[:theme].presence || "light"
   end
 
+  # True when the dashboard sidebar should render in its collapsed (hidden) state.
+  def sidebar_collapsed?
+    cookies[:sidebar_collapsed] == "true"
+  end
+
   # True when the authenticated dashboard sidebar is rendered for this request.
   def sidebar_visible?
     user_signed_in? && !devise_controller? && !public_page?
