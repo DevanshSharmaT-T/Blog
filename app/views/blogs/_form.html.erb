@@ -196,21 +196,31 @@
             <p class="form-hint">Setting a cover image adds +25 to SEO and promotion scores.</p>
           </div>
 
-          <!-- Preview thumbnail with hover-delete + click-to-open -->
+          <!-- Preview / focal-point picker -->
           <div data-cover-preview-target="preview" class="mt-3 hidden">
-            <div class="relative group w-80 h-80">
-              <a data-cover-preview-target="anchor" href="<%= @blog.cover_image_url %>" target="_blank" rel="noopener">
+            <div class="relative w-full max-w-md">
+              <div data-cover-preview-target="picker"
+                   data-action="pointerdown->cover-preview#startDrag pointermove->cover-preview#drag pointerup->cover-preview#endDrag"
+                   class="relative w-full aspect-[16/9] overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 cursor-crosshair select-none touch-none">
                 <img data-cover-preview-target="image" data-image-upload-target="image"
                      src="<%= @blog.cover_image_url %>"
                      alt="Cover preview"
-                     class="w-80 h-80 object-cover rounded-xl border border-gray-200 dark:border-gray-700">
-              </a>
+                     draggable="false"
+                     class="w-full h-full object-cover pointer-events-none">
+                <!-- Draggable focal marker -->
+                <div data-cover-preview-target="marker"
+                     class="absolute w-8 h-8 -ml-4 -mt-4 rounded-full border-2 border-white shadow-[0_0_0_2px_rgba(0,0,0,0.45)] bg-white/20 pointer-events-none"></div>
+              </div>
+              <!-- Remove button sits just past the top-right corner, clear of the drag area -->
               <button type="button" data-action="click->cover-preview#remove"
-                      class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                      class="absolute -top-2.5 -right-2.5 z-10 bg-gray-900 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center shadow-lg ring-2 ring-white dark:ring-gray-900 transition-colors"
                       aria-label="Remove cover image">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
               </button>
             </div>
+            <p class="form-hint mt-2 ml-10">Drag to choose which part of the image stays in view.</p>
+            <%= f.hidden_field :cover_focal_x, data: { cover_preview_target: "focalX" } %>
+            <%= f.hidden_field :cover_focal_y, data: { cover_preview_target: "focalY" } %>
           </div>
         </div>
 

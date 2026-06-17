@@ -217,7 +217,8 @@ class BlogsController < ApplicationController
   def blog_params
     params.require(:blog).permit(
       :title, :slug, :excerpt, :content, :content_format,
-      :cover_image_url, :seo_title, :seo_description,
+      :cover_image_url, :cover_focal_x, :cover_focal_y,
+      :seo_title, :seo_description,
       :template_id, :featured, :allow_comments
     )
   end

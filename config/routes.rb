@@ -154,4 +154,10 @@ Rails.application.routes.draw do
 
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
+
+  # Catch-all: send unknown URLs to a safe page instead of a static 404 (see
+  # ErrorsController). Declared last so every real route matches first; excludes the
+  # JSON API, ActiveStorage/ActionCable (/rails), and the health endpoint.
+  match "*unmatched", to: "errors#not_found", via: :all,
+        constraints: ->(req) { !req.path.match?(%r{\A/(api|rails|up)(/|\z)}) }
 end
