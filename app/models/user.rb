@@ -48,6 +48,8 @@ class User < ApplicationRecord
   # ─── Scopes ───────────────────────────────────────────────────────────────────
   scope :active,    -> { where(deleted_at: nil, is_active: true) }
   scope :not_deleted, -> { where(deleted_at: nil) }
+  scope :deleted,    -> { where.not(deleted_at: nil) }
+  scope :unverified, -> { where(confirmed_at: nil) }
 
   # ─── Callbacks ───────────────────────────────────────────────────────────────
   before_save :sync_email_verified_at
@@ -57,8 +59,28 @@ class User < ApplicationRecord
     update!(deleted_at: Time.current, is_active: false)
   end
 
+  # Undo a soft delete and re-enable sign-in.
+  def restore!
+    update!(deleted_at: nil, is_active: true)
+  end
+
   def deleted?
     deleted_at.present?
+  end
+
+  # Email-confirmation (Devise :confirmable) state, managed by admins from the
+  # user list. `sync_email_verified_at` mirrors confirmed_at into email_verified_at
+  # on set; unverify clears both explicitly since that callback never clears.
+  def verified?
+    confirmed_at.present?
+  end
+
+  def verify!
+    update!(confirmed_at: Time.current)
+  end
+
+  def unverify!
+    update!(confirmed_at: nil, email_verified_at: nil)
   end
 
   def active_for_authentication?

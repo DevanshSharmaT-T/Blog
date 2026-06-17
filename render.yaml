@@ -14,7 +14,7 @@ services:
     dockerfilePath: ./Dockerfile
     plan: starter            # free | starter | standard — adjust to your account/plan
     region: oregon           # CHANGE to your database's region (e.g. frankfurt, singapore)
-    branch: main             # branch to deploy from — change to "Deployment" if that's the one
+    branch: Deployment       # branch to deploy from (no "main" branch exists in this repo)
     healthCheckPath: /up
     autoDeploy: true
     # Run Puma directly on $PORT (Render sets PORT=10000) instead of the image's default

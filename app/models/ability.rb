@@ -34,8 +34,11 @@ class Ability
     can :read,   BlogAnalytic
     can :read,   SocialPlatform
 
-    # Users: read, update, toggle active, change role (owner-promotion blocked in controller)
-    can [ :index, :show, :update, :toggle_active, :change_role ], User
+    # Users: read, update, toggle active, change role, manage email verification,
+    # resend confirmation / password reset (owner-promotion blocked in controller).
+    # Delete + restore stay owner-only (default-deny covers :restore).
+    can [ :index, :show, :update, :toggle_active, :change_role,
+          :verify, :unverify, :resend_confirmation, :send_password_reset ], User
     cannot :destroy, User
 
     # Own profile

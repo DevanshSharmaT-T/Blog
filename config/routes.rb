@@ -81,6 +81,11 @@ Rails.application.routes.draw do
       member do
         patch :toggle_active
         patch :change_role
+        patch :verify
+        patch :unverify
+        patch :restore
+        post  :resend_confirmation
+        post  :send_password_reset
       end
     end
 

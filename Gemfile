@@ -68,6 +68,9 @@ gem "nokogiri", "~> 1.16"
 # CORS for API endpoints
 gem "rack-cors", "~> 2.0"
 
+# Rate limiting / IP blocking against bots, scanners, and brute-force attacks
+gem "rack-attack", "~> 6.7"
+
 # HTTP client for webhook dispatcher
 gem "httparty", "~> 0.22"
 

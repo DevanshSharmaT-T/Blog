@@ -55,12 +55,12 @@
 
           <%= render "devise/shared/password_field",
                 f: f, field: :password, label: "Password",
-                autocomplete: "new-password",
+                autocomplete: "new-password", validate: :password,
                 hint: (@minimum_password_length ? "Minimum #{@minimum_password_length} characters" : nil) %>
 
           <%= render "devise/shared/password_field",
                 f: f, field: :password_confirmation, label: "Confirm password",
-                autocomplete: "new-password" %>
+                autocomplete: "new-password", validate: :match %>
 
           <div class="rounded-xl border border-violet-200/70 dark:border-violet-500/20 bg-violet-50/70 dark:bg-violet-500/5 px-4 py-3">
             <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">

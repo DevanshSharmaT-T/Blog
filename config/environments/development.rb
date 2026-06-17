@@ -40,14 +40,20 @@ Rails.application.configure do
   # Host used when generating absolute/subdomain URLs in dev (server runs on :3002).
   config.action_controller.default_url_options = { host: "localhost", port: 3000 }
 
-  # Don't care if the mailer can't send.
-  config.action_mailer.raise_delivery_errors = false
+  brevo = Rails.application.credentials.brevo || {}
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.smtp_settings = {
+    address:              brevo[:SMTP_HOST] || ENV.fetch("SMTP_HOST", "smtp-relay.brevo.com"),
+    port:                 (brevo[:SMTP_PORT] || ENV.fetch("SMTP_PORT", 2525)).to_i,
+    user_name:            brevo[:SMTP_USER] || ENV["SMTP_USER"],
+    password:             brevo[:SMTP_PASS] || ENV["SMTP_PASS"],
+    authentication:       :login,
+    enable_starttls_auto: true,
+    open_timeout:         5,
+    read_timeout:         5
+  }
 
-  # Make template changes take effect immediately.
-  config.action_mailer.perform_caching = false
-
-  # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

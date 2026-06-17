@@ -38,9 +38,95 @@ export default class extends Controller {
 
   check(event) {
     const input = event.target
+    const kind = input.dataset.fieldValidatorKind || "text"
+
+    // Password checks run locally — no server round-trip, no debounce — so the
+    // strength meter and match verdict track every keystroke instantly.
+    if (kind === "password")     return this.validatePassword(input)
+    if (kind === "confirmation") return this.validateConfirmation(input)
+
     const prev = this.timers.get(input)
     if (prev) clearTimeout(prev)
     this.timers.set(input, setTimeout(() => this.run(input), this.debounceValue))
+  }
+
+  // --- Local password validation -------------------------------------------
+
+  validatePassword(input) {
+    const value = input.value
+
+    if (!value) {
+      this.updateMeter(input, 0)
+      this.clear(input)
+    } else if (value.length < 6) {
+      this.updateMeter(input, this.strengthScore(value))
+      this.flag(input, { message: "Password must be at least 6 characters", severity: "error" })
+    } else if (value.length > 128) {
+      this.updateMeter(input, this.strengthScore(value))
+      this.flag(input, { message: "Password must be at most 128 characters", severity: "error" })
+    } else {
+      const score = this.strengthScore(value)
+      this.updateMeter(input, score)
+      if (score < 3) {
+        this.flag(input, { message: "Weak — add a capital, number, or symbol", severity: "warning" })
+      } else {
+        this.clear(input)
+      }
+    }
+
+    // A changed password may make the confirmation match or stop matching.
+    const confirmation = this.inputTargets.find(
+      (i) => i.dataset.fieldValidatorKind === "confirmation"
+    )
+    if (confirmation && confirmation.value) this.validateConfirmation(confirmation)
+  }
+
+  validateConfirmation(input) {
+    if (!input.value) return this.clear(input)
+
+    const password = this.inputTargets.find(
+      (i) => i.dataset.fieldValidatorKind === "password"
+    )
+    if (password && input.value !== password.value) {
+      this.flag(input, { message: "Passwords don't match", severity: "error" })
+    } else {
+      this.clear(input)
+    }
+  }
+
+  // Score 0–4 from length and character-class variety.
+  strengthScore(value) {
+    if (!value) return 0
+    let score = 0
+    if (value.length >= 6)  score++
+    if (value.length >= 10) score++
+    if (/[a-z]/.test(value) && /[A-Z]/.test(value)) score++
+    if (/\d/.test(value))   score++
+    if (/[^A-Za-z0-9]/.test(value)) score++
+    return Math.min(4, score)
+  }
+
+  updateMeter(input, score) {
+    const group = input.closest(".form-group") || this.element
+    const bar   = group.querySelector("[data-strength-bar]")
+    const label = group.querySelector("[data-strength-label]")
+    if (!bar && !label) return
+
+    const levels = [
+      { width: "0%",   color: "bg-gray-300",    text: "" },
+      { width: "25%",  color: "bg-red-500",     text: "Weak" },
+      { width: "50%",  color: "bg-amber-500",   text: "Fair" },
+      { width: "75%",  color: "bg-emerald-500", text: "Good" },
+      { width: "100%", color: "bg-emerald-500", text: "Strong" }
+    ]
+    const level = levels[Math.max(0, Math.min(4, score))]
+
+    if (bar) {
+      bar.style.width = level.width
+      bar.classList.remove("bg-gray-300", "bg-red-500", "bg-amber-500", "bg-emerald-500")
+      bar.classList.add(level.color)
+    }
+    if (label) label.textContent = level.text
   }
 
   async run(input) {
@@ -71,7 +157,15 @@ export default class extends Controller {
   flag(input, { message, severity }) {
     const error = severity !== "warning"
 
-    input.classList.add("border-red-500", "focus:border-red-500", "focus:ring-red-500")
+    input.classList.remove(
+      "border-red-500", "focus:border-red-500", "focus:ring-red-500",
+      "border-amber-500", "focus:border-amber-500", "focus:ring-amber-500"
+    )
+    input.classList.add(
+      ...(error
+        ? ["border-red-500", "focus:border-red-500", "focus:ring-red-500"]
+        : ["border-amber-500", "focus:border-amber-500", "focus:ring-amber-500"])
+    )
 
     const msg = this.messageFor(input)
     if (msg) {
@@ -86,7 +180,10 @@ export default class extends Controller {
   }
 
   clear(input) {
-    input.classList.remove("border-red-500", "focus:border-red-500", "focus:ring-red-500")
+    input.classList.remove(
+      "border-red-500", "focus:border-red-500", "focus:ring-red-500",
+      "border-amber-500", "focus:border-amber-500", "focus:ring-amber-500"
+    )
 
     const msg = this.messageFor(input)
     if (msg) {
