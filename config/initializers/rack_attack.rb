@@ -38,7 +38,7 @@ class Rack::Attack
   )
 
   # Endpoints whose abuse should escalate to a full IP ban (Tier 2 brute force).
-  AUTH_POST_PATHS = ["/users/sign_in", "/users", "/users/confirmation", "/users/password"].freeze
+  AUTH_POST_PATHS = [ "/users/sign_in", "/users", "/users/confirmation", "/users/password" ].freeze
 
   ### Safelist — never throttled or blocked ####################################
   safelist("allow/health-and-assets") do |req|
@@ -48,7 +48,7 @@ class Rack::Attack
   end
 
   safelist("allow/localhost-in-dev") do |req|
-    Rails.env.development? && ["127.0.0.1", "::1"].include?(client_ip(req))
+    Rails.env.development? && [ "127.0.0.1", "::1" ].include?(client_ip(req))
   end
 
   ### Tier 1 — immediate 24h ban on scanner / exploit paths ####################
@@ -108,13 +108,13 @@ class Rack::Attack
   self.throttled_responder = lambda do |req|
     match = req.env["rack.attack.match_data"] || {}
     retry_after = match[:period] || 60
-    [429,
+    [ 429,
      { "Content-Type" => "text/plain", "Retry-After" => retry_after.to_s },
-     ["Too many requests. Please slow down and try again later.\n"]]
+     [ "Too many requests. Please slow down and try again later.\n" ] ]
   end
 
   self.blocklisted_responder = lambda do |_req|
-    [403, { "Content-Type" => "text/plain" }, ["Forbidden\n"]]
+    [ 403, { "Content-Type" => "text/plain" }, [ "Forbidden\n" ] ]
   end
 end
 
