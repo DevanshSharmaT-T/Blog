@@ -99,7 +99,8 @@
               <% manageable = user != current_user && (current_user.owner_role? || !user.owner_role?) %>
               <div class="inline-flex items-center gap-2">
                 <% if manageable && can?(:change_role, user) %>
-                  <%= form_with url: change_role_user_path(user), method: :patch, local: true, class: "inline" do |fr| %>
+                  <%= form_with url: change_role_user_path(user), method: :patch, local: true,
+                                class: "inline", data: { controller: "auto-submit" } do |fr| %>
                     <%= fr.select :role,
                           options_for_select(
                             (current_user.owner_role? ? [["Owner", "owner"]] : []) +
@@ -107,7 +108,7 @@
                             user.role
                           ),
                           {}, class: "form-input text-xs py-1 w-24",
-                              "data-action": "change->this.form.requestSubmit" %>
+                              "data-action": "change->auto-submit#submit" %>
                   <% end %>
                 <% end %>
 
