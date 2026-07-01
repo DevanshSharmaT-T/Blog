@@ -18,7 +18,9 @@ module ContentModeration
     # (case-insensitive, matched on word boundaries). Empty array when clean.
     def scan(text)
       str = text.to_s
-      return [] if str.blank?
+      # Guard the empty-term case: with no terms the regex alternation is empty and
+      # would spuriously match, so return early (also the fail-open path — see banned_words).
+      return [] if str.blank? || banned_terms.empty?
 
       str.downcase.scan(banned_words_regex).flatten.compact.uniq
     end
@@ -49,15 +51,27 @@ module ContentModeration
     private
 
     def banned_words
-      @banned_words ||= (YAML.safe_load_file(BANNED_WORDS_PATH) || {})
+      @banned_words ||= load_banned_words
+    end
+
+    # Fail open: a malformed/missing list must never 500 a create/edit flow (moderation
+    # is a soft first line of defence with an admin review flow behind it). Log loudly and
+    # treat as "no banned terms" so callers keep working; a restart picks up a fixed file.
+    def load_banned_words
+      YAML.safe_load_file(BANNED_WORDS_PATH) || {}
+    rescue => e
+      Rails.logger.error("[ContentModeration] Could not load #{BANNED_WORDS_PATH}: #{e.class}: #{e.message}")
+      {}
     end
 
     # One combined, anchored regex over every term. Word boundaries (\b) prevent
     # false positives such as "ass" inside "class"; \p{L} lets boundaries work
-    # for accented letters too. Phrases (e.g. "heil hitler") match verbatim.
+    # for accented letters too. Terms are ordered longest-first so multi-word
+    # phrases (e.g. "heil hitler") win over their component words ("heil", "hitler")
+    # in the alternation instead of being shadowed by them.
     def banned_words_regex
       @banned_words_regex ||= begin
-        alternation = banned_terms.map { |w| Regexp.escape(w) }.join("|")
+        alternation = banned_terms.sort_by { |w| -w.length }.map { |w| Regexp.escape(w) }.join("|")
         Regexp.new('(?<![\p{L}\p{N}])(?:' + alternation + ')(?![\p{L}\p{N}])', Regexp::IGNORECASE)
       end
     end

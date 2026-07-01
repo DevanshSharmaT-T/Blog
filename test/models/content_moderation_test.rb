@@ -17,6 +17,27 @@ class ContentModerationTest < ActiveSupport::TestCase
     assert_includes ContentModeration.scan("they shouted Heil Hitler"), "heil hitler"
   end
 
+  test "detects previously-broken @-leading terms (banned_words.yml parses)" do
+    # Regression lock: a leading '@' is a reserved YAML indicator; unquoted, it raised
+    # Psych::SyntaxError and 500'd every flow calling scan (blog create/edit, user, checks).
+    assert_includes ContentModeration.scan("you @sshole"), "@sshole"
+    assert_includes ContentModeration.scan("what an @ss"), "@ss"
+  end
+
+  test "scan fails open (returns [] and never raises) when the list cannot be loaded" do
+    original = YAML.method(:safe_load_file)
+    YAML.define_singleton_method(:safe_load_file) { |*| raise "simulated parse failure" }
+    ContentModeration.reload!
+
+    assert_nothing_raised do
+      assert_equal [], ContentModeration.scan("you @sshole and nazi stuff")
+      assert ContentModeration.clean?("literally anything")
+    end
+  ensure
+    YAML.define_singleton_method(:safe_load_file, original)
+    ContentModeration.reload!
+  end
+
   test "clean text returns no matches" do
     assert_empty ContentModeration.scan("A friendly post about gardening and tea")
     assert ContentModeration.clean?("gardening and tea")

@@ -49,10 +49,10 @@ profanity:
   - b@stard
   - bstard
   - asshole
-  - @sshole
+  - "@sshole"
   - assh0le
   - a$$h0le
-  - @$$h0l3
+  - "@$$h0l3"
   - dickhead
   - d1ckhead
   - d!ckhead
@@ -70,7 +70,7 @@ profanity:
   - j@ck@ss
   - j@ckass
   - ass
-  - @ss
+  - "@ss"
   - a$$
   - pussy
   - p0ssy
@@ -139,13 +139,13 @@ profanity:
   - j@ckoff
   - jack0ff
   - arse
-  - @rs3
+  - "@rs3"
   - ar$e
-  - @rse
+  - "@rse"
   - arsehole
-  - @rseh0le
+  - "@rseh0le"
   - arsh0l3
-  - @r$3h0l3
+  - "@r$3h0l3"
   - bitchass
   - b1tch@ss
   - bitcha$$
@@ -258,7 +258,7 @@ slurs:
   - sl0p3
   - sl0pe
   - abo
-  - @b0
+  - "@b0"
   - ab0
   - yid
   - y1d
@@ -346,10 +346,10 @@ sensitive:
   - klansm@n
   - kl@nsman
   - aryan nation
-  - @ry@n n@t10n
+  - "@ry@n n@t10n"
   - aryannation
   - antifa
-  - @nt1f@
+  - "@nt1f@"
   - antif@
   - ecoterrorism
   - 3c0t3rr0r1sm
