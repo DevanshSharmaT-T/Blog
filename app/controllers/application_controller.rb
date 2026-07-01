@@ -52,12 +52,20 @@ class ApplicationController < ActionController::Base
     Rails.logger.error("[Unhandled] #{exception.class}: #{exception.message}")
     Rails.logger.error(Array(exception.backtrace).first(15).join("\n"))
 
-    respond_to do |format|
-      format.json { render json: { error: "Something went wrong." }, status: :internal_server_error }
-      format.any  { redirect_to safe_fallback_path, alert: "Something went wrong — we've brought you back to a safe page." }
+    if request.format.json?
+      render json: { error: "Something went wrong." }, status: :internal_server_error
+    elsif browser_navigation?
+      redirect_to safe_fallback_path, alert: "Something went wrong — we've brought you back to a safe page."
+    else
+      head :internal_server_error
     end
-  rescue ActionController::UnknownFormat
-    redirect_to safe_fallback_path, alert: "Something went wrong — we've brought you back to a safe page."
+  end
+
+  # A real browser navigation we can safely bounce to a friendly page: a GET whose
+  # format is HTML. Asset fetches (.ico/.png/.css/.map), API/JSON calls, and non-GET
+  # verbs get an honest HTTP status instead of a 302 to the dashboard.
+  def browser_navigation?
+    request.get? && request.format.html?
   end
 
   # Where to send a user after an error: their dashboard/blogs when signed in, root

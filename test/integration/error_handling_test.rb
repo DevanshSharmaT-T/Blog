@@ -26,4 +26,21 @@ class ErrorHandlingTest < ActionDispatch::IntegrationTest
     # Excluded from the catch-all, so it does NOT redirect to the error handler.
     assert_not_equal 302, response.status
   end
+
+  test "asset-like request returns a real 404 instead of redirecting" do
+    get "/apple-touch-icon.png"
+    assert_response :not_found
+    assert_nil response.headers["Location"]
+  end
+
+  test "unknown path with non-GET verb returns 404 rather than a redirect" do
+    post "/no-such-page-here"
+    assert_response :not_found
+  end
+
+  test "favicon.ico is served statically and never hits the catch-all" do
+    get "/favicon.ico"
+    assert_response :success
+    assert_includes [ "image/x-icon", "image/vnd.microsoft.icon" ], response.media_type
+  end
 end
