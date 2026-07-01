@@ -1,5 +1,3 @@
-@import "./templates.css";
-
 /* ════════════════════════════════════════════════════════════════════════════
    Dark mode variant — flipped by `data-theme="dark"` on <html>.
    Default (no attribute / data-theme="light") = light.
