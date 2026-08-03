@@ -1,0 +1,355 @@
+# Curated banned / sensitive word lists used by ContentModeration.
+#
+# These are matched case-insensitively on WORD BOUNDARIES, so an entry like
+# "ass" will NOT match inside "class" or "passage". Multi-word entries (e.g.
+# "heil hitler") are matched as phrases. Keep entries lowercase.
+#
+# Categories are informational only (surfaced to admins for context) — every
+# category is enforced identically. Edit this file to tune the policy; it is
+# loaded once and memoized, so a server restart is required to pick up changes.
+#
+# NOTE: This is a deliberately conservative seed list. Expand it for your
+# audience. It is a first line of defence, NOT a replacement for human review —
+# which is exactly why blog content is routed to an admin review flow rather
+# than hard-blocked.
+
+# Explicit / profane language.
+profanity:
+  - fuck
+  - f*ck
+  - f@ck
+  - fck
+  - fuk
+  - fucc
+  - f**k
+  - fucker
+  - f@cker
+  - fukker
+  - fucking
+  - f@cking
+  - fukin
+  - fuking
+  - motherfucker
+  - m0therfucker
+  - mothafucka
+  - muthafucka
+  - shit
+  - sh1t
+  - sh!t
+  - sht
+  - bullshit
+  - bullsh1t
+  - bullsh!t
+  - bitch
+  - b1tch
+  - b!tch
+  - btch
+  - bicth
+  - bastard
+  - b@stard
+  - bstard
+  - asshole
+  - "@sshole"
+  - assh0le
+  - a$$h0le
+  - "@$$h0l3"
+  - dickhead
+  - d1ckhead
+  - d!ckhead
+  - dckhead
+  - cunt
+  - c0nt
+  - cnt
+  - prick
+  - pr1ck
+  - pr!ck
+  - wanker
+  - w@nker
+  - wnk@r
+  - jackass
+  - j@ck@ss
+  - j@ckass
+  - ass
+  - "@ss"
+  - a$$
+  - pussy
+  - p0ssy
+  - puss1e
+  - pussye
+  - dick
+  - d1ck
+  - d!ck
+  - cock
+  - c0ck
+  - k0k
+  - twat
+  - tw@t
+  - clit
+  - cl1t
+  - slut
+  - sl*ut
+  - slvt
+  - sl0t
+  - sl7t
+  - whore
+  - wh0r3
+  - wh0re
+  - wh*re
+  - whor3
+  - w00se
+  - skank
+  - sk@nk
+  - sk4nk
+  - tosser
+  - t0ss3r
+  - t0sser
+  - toss3r
+  - bollocks
+  - b0ll0cks
+  - b0llocks
+  - ballacks
+  - scumbag
+  - scumb@g
+  - scumb4g
+  - douchebag
+  - d0uch3b@g
+  - d0ucheb@g
+  - doucheb4g
+  - douch3
+  - bugger
+  - b0gg3r
+  - bugg3r
+  - crap
+  - cr@p
+  - cr*p
+  - cr4p
+  - dumbass
+  - dumb@ss
+  - dumba$$
+  - dumb@s
+  - dipshit
+  - d1psh1t
+  - d!psh!t
+  - d1psht
+  - horseshit
+  - h0rs3sh1t
+  - h0rsesh!t
+  - jackoff
+  - j@ck0ff
+  - j@ckoff
+  - jack0ff
+  - arse
+  - "@rs3"
+  - ar$e
+  - "@rse"
+  - arsehole
+  - "@rseh0le"
+  - arsh0l3
+  - "@r$3h0l3"
+  - bitchass
+  - b1tch@ss
+  - bitcha$$
+  - bellend
+  - b3ll3nd
+  - b3llend
+  - bell3nd
+  - carpetmuncher
+  - c@rp3tmunch3r
+  - mofo
+  - m0f0
+  - m0fo
+
+# Slurs and hateful epithets (intentionally partial — extend for your locale).
+slurs:
+  - nigger
+  - n1gger
+  - n!gger
+  - n1gg3r
+  - nggre
+  - nigers
+  - nigga
+  - n1gga
+  - n!gga
+  - n1gg4
+  - niga
+  - faggot
+  - f@ggot
+  - fagg0t
+  - f@g
+  - fag
+  - f@g0t
+  - retard
+  - r3tard
+  - r3t@rd
+  - ret@rd
+  - tranny
+  - tr@nny
+  - trann1e
+  - tranney
+  - chink
+  - ch1nk
+  - ch!nk
+  - spic
+  - sp1c
+  - sp!c
+  - kike
+  - k1k3
+  - kyke
+  - wetback
+  - w3tback
+  - wetb@ck
+  - coon
+  - c00n
+  - dyke
+  - d1k3
+  - dyk3
+  - gypsy
+  - g1psy
+  - gook
+  - g00k
+  - g0k
+  - guuk
+  - honky
+  - h0nky
+  - h0nk1e
+  - honkie
+  - beaner
+  - b3@n3r
+  - b3aner
+  - b3@ner
+  - kraut
+  - kr@ut
+  - kr4ut
+  - raghead
+  - r@gh3@d
+  - r@ghead
+  - ragh3ad
+  - towelhead
+  - t0w3lh3@d
+  - towelh3ad
+  - t0w3lhead
+  - cholo
+  - ch0l0
+  - paki
+  - p@k1
+  - p@ki
+  - pak1
+  - darkie
+  - d@rk13
+  - d@rkie
+  - dark13
+  - negro
+  - n3gr0
+  - n3gro
+  - negr0
+  - redneck
+  - r3dn3ck
+  - redn3ck
+  - r3dneck
+  - shemale
+  - sh3m@l3
+  - sh3male
+  - shem@l3
+  - niglet
+  - n1gl3t
+  - n!gl3t
+  - n1glet
+  - slope
+  - sl0p3
+  - sl0pe
+  - abo
+  - "@b0"
+  - ab0
+  - yid
+  - y1d
+  - gringo
+  - gr1ng0
+  - gring0
+
+# Sensitive / extremist content: glorification terms and figures. Because these
+# words can also appear in legitimate critical or educational writing, blog
+# content that matches is routed to admin REVIEW (not auto-rejected), while
+# usernames/display names containing them are blocked outright.
+sensitive:
+  - heil
+  - hiel hit
+  - hitler
+  - h1tler
+  - h!tl3r
+  - h1tl3r
+  - heil hitler
+  - h31l h1tl3r
+  - he1l h1tler
+  - nazi
+  - n@z1
+  - n@zi
+  - naz1
+  - neo-nazi
+  - n3o-n@z1
+  - neo nazi
+  - white power
+  - wh1t3 p0w3r
+  - whitep0wer
+  - white supremacy
+  - wh1t3 supr3m@cy
+  - kkk
+  - k.k.k.
+  - k k k
+  - ku klux klan
+  - ku-klux-klan
+  - kukluxklan
+  - jihad
+  - j1h@d
+  - jih@d
+  - j1had
+  - isis
+  - 1s1s
+  - i.s.i.s.
+  - al-qaeda
+  - al qaeda
+  - alqaeda
+  - al-q@eda
+  - terrorist
+  - t3rr0r1st
+  - terr0rist
+  - terror1st
+  - genocide
+  - g3n0c1d3
+  - genoc1de
+  - taliban
+  - t@l1b@n
+  - t@liban
+  - tal1b@n
+  - boko haram
+  - b0k0 h@r@m
+  - b0koh@r@m
+  - hezbollah
+  - h3zb0ll@h
+  - h3zbollah
+  - hezb0llah
+  - hamas
+  - h@m@s
+  - h4m4s
+  - holocaust
+  - h0l0c@ust
+  - h0locaust
+  - hol0c@ust
+  - skinhead
+  - sk1nh3@d
+  - sk1nhead
+  - skinh3ad
+  - osama bin laden
+  - 0s@m@ b1n l@d3n
+  - osamabinladen
+  - klansman
+  - kl@nsm@n
+  - klansm@n
+  - kl@nsman
+  - aryan nation
+  - "@ry@n n@t10n"
+  - aryannation
+  - antifa
+  - "@nt1f@"
+  - antif@
+  - ecoterrorism
+  - 3c0t3rr0r1sm

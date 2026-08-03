@@ -1,0 +1,31 @@
+# Render Blueprint for the production deploy (Docker).
+# Docs: https://render.com/docs/blueprint-spec
+#
+# IMPORTANT before first deploy:
+#   * `region` MUST match the region of your Postgres database, or the internal
+#     `dpg-...` hostname (read from Rails credentials) will not resolve and boot will fail.
+#   * Do NOT add a DATABASE_URL env var or a `fromDatabase` link here: the database
+#     connection comes from encrypted credentials, and a DATABASE_URL would override it.
+#   * Set RAILS_MASTER_KEY as a secret in the Render dashboard (it's `sync: false` below).
+services:
+  - type: web
+    name: my-blog
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter            # free | starter | standard — adjust to your account/plan
+    region: oregon           # CHANGE to your database's region (e.g. frankfurt, singapore)
+    branch: Deployment       # branch to deploy from (no "main" branch exists in this repo)
+    healthCheckPath: /up
+    autoDeploy: true
+    # Run Puma directly on $PORT (Render sets PORT=10000) instead of the image's default
+    # Thruster wrapper. Behind Render's TLS-terminating edge, Thruster is redundant, and its
+    # localhost proxy resolves to IPv6 [::1] while Puma binds IPv4 0.0.0.0 -> every request 502s.
+    # (The entrypoint still runs db:prepare because the command ends in `bin/rails server`.)
+    dockerCommand: ./bin/rails server
+    envVars:
+      - key: RAILS_MASTER_KEY
+        sync: false           # set the value in the Render dashboard; never commit it
+      - key: SOLID_QUEUE_IN_PUMA
+        value: "true"         # run Solid Queue jobs (config/recurring.yml) inside Puma
+      - key: RAILS_MAX_THREADS
+        value: "3"

@@ -1,0 +1,17 @@
+<%# locals: image, blog — one gallery image tile (matches image_gallery_controller#appendTile) %>
+<div class="image-tile relative group aspect-square" data-image-id="<%= image.id %>">
+  <a href="<%= image.url %>" target="_blank" rel="noopener">
+    <img src="<%= image.url %>" alt="<%= image.alt_text %>"
+         class="w-full h-full object-cover rounded-lg border border-gray-200 dark:border-gray-700">
+  </a>
+  <button type="button" data-action="click->image-gallery#insert"
+          data-url="<%= image.url %>"
+          class="absolute bottom-1 left-1 opacity-0 group-hover:opacity-100 transition-opacity bg-violet-600 hover:bg-violet-700 text-white text-xs rounded px-2 py-0.5"
+          title="Insert into content">Insert</button>
+  <button type="button" data-action="click->image-gallery#remove"
+          data-delete-url="<%= blog_image_path(blog, image) %>"
+          class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center"
+          aria-label="Delete image">
+    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+  </button>
+</div>

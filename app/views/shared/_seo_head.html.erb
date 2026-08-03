@@ -1,0 +1,45 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= page_title %></title>
+<meta name="description" content="<%= meta_description %>">
+<link rel="canonical" href="<%= canonical_url %>">
+
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icon.png">
+
+<%= csrf_meta_tags %>
+<%= csp_meta_tag %>
+
+<!-- Open Graph -->
+<meta property="og:site_name"   content="MyBlog">
+<meta property="og:title"       content="<%= page_title %>">
+<meta property="og:description" content="<%= meta_description %>">
+<meta property="og:type"        content="<%= og_type %>">
+<meta property="og:url"         content="<%= canonical_url %>">
+<meta property="og:image"       content="<%= og_image %>">
+
+<% if @blog&.persisted? %>
+  <meta property="article:published_time" content="<%= @blog.published_at&.iso8601 %>">
+  <meta property="article:modified_time"  content="<%= @blog.updated_at&.iso8601 %>">
+  <% if @blog.author %>
+    <meta property="article:author" content="<%= @blog.author.name %>">
+  <% end %>
+  <% @blog.topics.each do |t| %>
+    <meta property="article:tag" content="<%= t.name %>">
+  <% end %>
+<% end %>
+
+<!-- Twitter Card -->
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="<%= page_title %>">
+<meta name="twitter:description" content="<%= meta_description %>">
+<meta name="twitter:image"       content="<%= og_image %>">
+
+<!-- RSS/Atom -->
+<%= auto_discovery_link_tag(:atom, blog_feed_url(format: :atom), title: "MyBlog — Latest Posts") rescue nil %>
+
+<!-- Structured data (BlogPosting) -->
+<% if @blog&.persisted? && @blog.published_status? %>
+  <script type="application/ld+json"><%== blog_json_ld(@blog) %></script>
+<% end %>

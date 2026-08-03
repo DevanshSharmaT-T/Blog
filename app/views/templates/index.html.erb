@@ -1,0 +1,62 @@
+<% content_for :title, "Templates" %>
+<% content_for :meta_description, "Browse 30+ visual templates for your blog posts. Each template defines the typography, palette, and layout your readers experience." %>
+
+<%
+  categories = ["all"] + @templates.map(&:category).uniq.sort
+%>
+
+<section class="reading-container archive-container" data-controller="template-filter" data-template-filter-active-value="all">
+  <header class="archive-header">
+    <p class="archive-eyebrow">Template Gallery</p>
+    <h1 class="reading-title archive-title">Pick a look for your blog</h1>
+    <p class="reading-deck archive-deck">
+      <%= @templates.size %> visual templates — typography, palette, and layout choices.
+      Click any preview to see the full sample.
+    </p>
+    <% if user_signed_in? && can?(:create, Template) %>
+      <div style="margin-top: 1.25rem;">
+        <%= link_to "+ New Template", new_template_path, class: "btn btn-primary btn-sm" %>
+      </div>
+    <% end %>
+  </header>
+
+  <!-- Category filter -->
+  <nav class="archive-filters" aria-label="Filter templates by category">
+    <% categories.each do |cat| %>
+      <button type="button"
+              class="topic-pill <%= 'active' if cat == 'all' %>"
+              data-template-filter-target="chip"
+              data-category="<%= cat %>"
+              data-action="template-filter#filter">
+        <%= cat.capitalize %>
+      </button>
+    <% end %>
+  </nav>
+
+  <div class="template-grid">
+    <% @templates.each do |template| %>
+      <a href="<%= template_path(template) %>"
+         class="template-card"
+         data-template-filter-target="card"
+         data-category="<%= template.category %>"
+         aria-label="Preview <%= template.name %>">
+        <div class="template-card-inner">
+          <%= render "shared/template_preview", template: template, aspect: "card" %>
+          <% if template.is_premium %>
+            <span class="template-premium-badge">Premium</span>
+          <% end %>
+          <div class="template-card-meta">
+            <p class="template-card-name"><%= template.name %></p>
+            <p class="template-card-cat"><%= template.category.capitalize %> · <%= template.blogs.count %> uses</p>
+          </div>
+        </div>
+      </a>
+    <% end %>
+
+    <% if @templates.empty? %>
+      <div class="card archive-empty">
+        <p>No templates available yet.</p>
+      </div>
+    <% end %>
+  </div>
+</section>

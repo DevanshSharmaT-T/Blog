@@ -1,0 +1,14 @@
+<% if resource.errors.any? %>
+  <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-4" data-turbo-cache="false" role="alert">
+    <p class="text-red-400 font-medium text-sm mb-2">
+      <%= I18n.t("errors.messages.not_saved",
+                 count: resource.errors.count,
+                 resource: resource.class.model_name.human.downcase) %>
+    </p>
+    <ul class="list-disc list-inside text-red-300 text-sm space-y-1">
+      <% resource.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

@@ -1,0 +1,82 @@
+<% content_for :title, "Integrations" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Integrations</h1>
+    <p class="page-subtitle">Connect third-party services to supercharge your blog</p>
+  </div>
+  <%= link_to new_settings_integration_path, class: "btn btn-primary" do %>
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+    Add Integration
+  <% end %>
+</div>
+
+<div class="page-content space-y-6">
+  <% integration_types = {
+    "analytics" => { label: "Analytics", icon: "📊" },
+    "email" => { label: "Email Marketing", icon: "📧" },
+    "seo" => { label: "SEO Tools", icon: "🔍" },
+    "ai" => { label: "AI Tools", icon: "🤖" },
+    "storage" => { label: "Storage & CDN", icon: "☁️" },
+    "social" => { label: "Social Media", icon: "📱" },
+    "notification" => { label: "Notifications", icon: "🔔" },
+    "custom" => { label: "Custom", icon: "⚙️" }
+  } %>
+
+  <% integration_types.each do |type_key, type_info| %>
+    <% integrations = @by_type[type_key] || [] %>
+    <% if integrations.any? %>
+      <div class="card overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center gap-3">
+          <span class="text-xl"><%= type_info[:icon] %></span>
+          <h2 class="text-base font-semibold text-gray-900 dark:text-white"><%= type_info[:label] %></h2>
+          <span class="badge badge-published ml-auto"><%= integrations.size %> connected</span>
+        </div>
+        <div class="divide-y divide-gray-200 dark:divide-gray-800">
+          <% integrations.each do |integration| %>
+            <div class="flex items-center gap-4 px-6 py-4">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-900 dark:text-white"><%= integration.label || integration.provider.humanize %></p>
+                <p class="text-xs text-gray-500 capitalize"><%= integration.provider %></p>
+                <% if integration.last_tested_at %>
+                  <p class="text-xs text-gray-500 mt-0.5">Last tested <%= time_ago_in_words(integration.last_tested_at) %> ago</p>
+                <% end %>
+              </div>
+              <span class="badge-<%= integration.status %>"><%= integration.status.capitalize %></span>
+              <% if integration.error_message %>
+                <span class="text-xs text-red-600 dark:text-red-400 truncate max-w-xs" title="<%= integration.error_message %>">
+                  <%= integration.error_message.truncate(40) %>
+                </span>
+              <% end %>
+              <div class="flex items-center gap-2">
+                <%= button_to test_connection_settings_integration_path(integration),
+                    method: :post, class: "btn btn-secondary btn-sm",
+                    data: { turbo: false },
+                    aria: { label: "Test #{integration.provider} connection" } do %>
+                  Test
+                <% end %>
+                <%= link_to edit_settings_integration_path(integration), class: "btn btn-secondary btn-sm" do %>
+                  Edit
+                <% end %>
+                <%= button_to settings_integration_path(integration), method: :delete,
+                    data: { turbo_confirm: "Remove this integration?" },
+                    class: "btn btn-danger btn-sm" do %>
+                  Remove
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% if @integrations.empty? %>
+    <div class="card py-20 text-center">
+      <div class="text-5xl mb-4">🔌</div>
+      <p class="text-gray-700 dark:text-gray-300 font-medium">No integrations yet</p>
+      <p class="text-gray-500 dark:text-gray-500 text-sm mt-1">Connect analytics, email, AI tools and more.</p>
+      <%= link_to "Add Your First Integration", new_settings_integration_path, class: "btn btn-primary mt-4 mx-auto" %>
+    </div>
+  <% end %>
+</div>

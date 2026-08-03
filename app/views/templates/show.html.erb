@@ -1,0 +1,83 @@
+<% content_for :title, "#{@template.name} — Template Preview" %>
+<% content_for :meta_description, @template.description.to_s.truncate(160) %>
+
+<%
+  # Sample article rendered inside this template's scope so writers can see
+  # exactly what a blog post would look like before picking it.
+  sample_paragraphs = [
+    "Some say the future of writing is the same as its past — a person, a sentence, and a reader who trusts the sentence enough to follow it to the next one. Every template in this gallery serves that simple contract, but each one stages it differently.",
+    "Typography sets the tempo. A serif drawn for newsprint speaks differently than a monospace lifted from a terminal. A palette set in warm cream invites you to lean in; one set in deep black asks you to focus. Whitespace, line-height, and contrast do the work that pictures cannot.",
+    "## The hierarchy of attention\n\nA strong layout teaches readers where to begin and where to pause. The headline anchors. The deck explains. The byline situates. The drop cap (when present) marks the moment your eye should settle in. Everything below carries you forward.",
+    "Lists, code blocks, blockquotes, and images each have a role — and the right template treats them with care so the prose stays the loudest voice in the room.",
+    "## Try this template\n\nReturn to the gallery, then choose this look for your next post — or one of the other 29 alternatives. The text you write stays the same; only the way it lands on the page changes."
+  ]
+
+  sample_content = sample_paragraphs.join("\n\n")
+  renderer = Redcarpet::Markdown.new(
+    RougeRenderer.new(hard_wrap: true),
+    autolink: true, tables: true, fenced_code_blocks: true,
+    strikethrough: true, superscript: true, no_intra_emphasis: true
+  )
+  sample_body = sanitize(renderer.render(sample_content),
+                         tags: MarkdownHelper::ALLOWED_TAGS,
+                         attributes: MarkdownHelper::ALLOWED_ATTRS)
+%>
+
+<!-- Live full-page sample wrapped in the template's CSS scope -->
+<article class="reading-article tpl tpl-<%= @template.slug %>"
+         data-template="<%= @template.slug %>"
+         aria-label="<%= @template.name %> sample article">
+
+  <div class="reading-progress-bar" data-controller="reading-progress" aria-hidden="true"></div>
+
+  <header class="reading-container reading-header">
+    <nav class="reading-topics" aria-label="Topics">
+      <span class="topic-pill">Sample</span>
+      <span class="topic-pill"><%= @template.category.capitalize %></span>
+    </nav>
+
+    <h1 class="reading-title">A sample article in <%= @template.name %></h1>
+    <p class="reading-deck">An anatomy of the layout — headline, deck, byline, body. Drop your own text in to see exactly how it lands.</p>
+
+    <address class="reading-byline">
+      <span class="w-10 h-10 rounded-full inline-flex items-center justify-center font-semibold text-white shrink-0"
+            style="background: linear-gradient(135deg, var(--color-brand-400), var(--color-brand-700));">J</span>
+      <span>
+        By <a href="#" rel="author">Jane Doe</a>
+        <span class="sep">·</span>
+        <time datetime="2026-03-12">March 12, 2026</time>
+        <span class="sep">·</span>
+        <span>6 min read</span>
+      </span>
+    </address>
+  </header>
+
+  <div class="reading-container">
+    <div class="prose-blog">
+      <%= sample_body %>
+    </div>
+  </div>
+
+</article>
+
+<!-- Picker toolbar -->
+<aside class="template-picker-bar <%= 'template-picker-bar--with-sidebar' if sidebar_visible? %>">
+  <div class="template-picker-inner">
+    <div>
+      <p class="template-picker-name"><%= @template.name %></p>
+      <p class="template-picker-meta">
+        <%= @template.category.capitalize %>
+        <% if @template.is_premium %> · <span style="color: #d97706;">Premium</span><% end %>
+        <% if @template.description.present? %>
+          · <%= @template.description %>
+        <% end %>
+      </p>
+    </div>
+    <div class="template-picker-actions">
+      <%= link_to "← All templates", templates_path, class: "btn btn-secondary btn-sm" %>
+      <% if user_signed_in? && can?(:update, @template) %>
+        <%= link_to "Edit", edit_template_path(@template), class: "btn btn-secondary btn-sm" %>
+      <% end %>
+    </div>
+  </div>
+</aside>

@@ -1,0 +1,58 @@
+<% content_for :title, "Moderation Queue" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Moderation Queue</h1>
+    <p class="page-subtitle">Posts flagged for banned or sensitive content, awaiting admin review.</p>
+  </div>
+</div>
+
+<div class="page-content">
+  <% if @blogs.empty? %>
+    <div class="card p-10 text-center">
+      <svg class="w-10 h-10 mx-auto text-emerald-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <p class="text-gray-700 dark:text-gray-300 font-medium">Nothing to review</p>
+      <p class="text-sm text-gray-500 mt-1">No posts are currently flagged for moderation.</p>
+    </div>
+  <% else %>
+    <div class="space-y-4">
+      <% @blogs.each do |blog| %>
+        <div class="card p-5">
+          <div class="flex items-start justify-between gap-4 flex-wrap">
+            <div class="min-w-0">
+              <p class="text-base font-semibold text-gray-900 dark:text-white truncate"><%= blog.title %></p>
+              <p class="text-sm text-gray-500 mt-0.5">
+                by <%= blog.author&.name %> ·
+                <span class="badge-<%= blog.status %>"><%= blog.status.capitalize %></span> ·
+                updated <%= time_ago_in_words(blog.updated_at) %> ago
+              </p>
+              <% if blog.moderation_flagged_terms.present? %>
+                <p class="text-sm text-amber-700 dark:text-amber-400 mt-2">
+                  Flagged terms: <span class="font-mono"><%= blog.moderation_flagged_terms %></span>
+                </p>
+              <% end %>
+              <% if blog.excerpt.present? %>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2"><%= blog.excerpt %></p>
+              <% end %>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <%= button_to approve_moderation_blog_path(blog), method: :patch, class: "btn btn-success btn-sm",
+                    form: { data: { turbo_confirm: "Approve \"#{blog.title}\"? The author will be able to publish it." } } do %>
+                Approve
+              <% end %>
+              <%= button_to reject_moderation_blog_path(blog), method: :patch, class: "btn btn-danger btn-sm",
+                    form: { data: { turbo_confirm: "Return \"#{blog.title}\" to its author as a draft?" } } do %>
+                Reject
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="mt-6">
+      <%= render "shared/pagy_nav", pagy: @pagy if @pagy.pages > 1 %>
+    </div>
+  <% end %>
+</div>

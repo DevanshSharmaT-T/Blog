@@ -1,0 +1,49 @@
+<% content_for :title, "All Posts" %>
+<% content_for :meta_description, "Browse all published posts on MyBlog — stories, tutorials, and ideas on technology, design, and creativity." %>
+
+<section class="reading-container archive-container">
+  <header class="archive-header">
+    <p class="archive-eyebrow">The Archive</p>
+    <h1 class="reading-title archive-title">All posts</h1>
+    <p class="reading-deck archive-deck">
+      <%= pluralize(@pagy.count, "published post") %> on MyBlog.
+      <%= link_to "RSS feed", blog_feed_path(format: :atom), class: "topic-pill" %>
+    </p>
+  </header>
+
+  <nav class="archive-filters" aria-label="Browse">
+    <%= link_to "All posts", blog_archive_path(topic_id: params[:topic_id]),
+          class: "topic-pill #{'active' if @tab != 'developers'}" %>
+    <%= link_to "From the developers", blog_archive_path(tab: "developers", topic_id: params[:topic_id]),
+          class: "topic-pill #{'active' if @tab == 'developers'}" %>
+  </nav>
+
+  <% if @topics.any? %>
+    <nav class="archive-filters" aria-label="Filter by topic">
+      <%= link_to "All", blog_archive_path(tab: @tab),
+            class: "topic-pill #{'active' if params[:topic_id].blank?}" %>
+      <% @topics.each do |topic| %>
+        <%= link_to topic.name, blog_archive_path(tab: @tab, topic_id: topic.id),
+              class: "topic-pill #{'active' if params[:topic_id].to_s == topic.id.to_s}" %>
+      <% end %>
+    </nav>
+  <% end %>
+
+  <% if @blogs.empty? %>
+    <div class="card archive-empty">
+      <p>No posts yet.</p>
+    </div>
+  <% else %>
+    <div class="archive-grid">
+      <% @blogs.each do |blog| %>
+        <%= render "blogs/card", blog: blog %>
+      <% end %>
+    </div>
+
+    <% if @pagy.pages > 1 %>
+      <nav class="reading-share archive-pagy" aria-label="Pagination">
+        <%== pagy_nav(@pagy) %>
+      </nav>
+    <% end %>
+  <% end %>
+</section>

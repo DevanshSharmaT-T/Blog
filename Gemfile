@@ -2,23 +2,77 @@ source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 8.1.3"
+
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
-# Use sqlite3 as the database for Active Record
-gem "sqlite3", ">= 2.1"
+
+# PostgreSQL adapter
+gem "pg", "~> 1.5"
+
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
+
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 gem "importmap-rails"
+
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 gem "turbo-rails"
+
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails"
+
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
-# Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-# gem "bcrypt", "~> 3.1.7"
+# Tailwind CSS
+gem "tailwindcss-rails", "~> 3.0"
+
+# Authentication
+gem "devise", "~> 4.9"
+
+# Authorization
+gem "cancancan", "~> 3.5"
+
+# JWT for API token auth
+gem "jwt", "~> 2.8"
+
+# Password hashing (bcrypt for has_secure_password / Devise)
+gem "bcrypt", "~> 3.1.7"
+
+# Cloudinary for image storage
+gem "cloudinary", "~> 1.28"
+
+# AWS S3 (optional fallback)
+gem "aws-sdk-s3", require: false
+
+# Image processing for Active Storage
+gem "image_processing", "~> 1.2"
+
+# Pagination
+gem "pagy", "~> 9.0"
+
+# Search & filtering
+gem "ransack", "~> 4.2"
+
+# Charts
+gem "chartkick", "~> 5.0"
+gem "groupdate", "~> 6.4"
+
+# Markdown rendering
+gem "redcarpet", "~> 3.6"
+gem "rouge", "~> 4.4"
+
+# HTML parsing for readability scoring
+gem "nokogiri", "~> 1.16"
+
+# CORS for API endpoints
+gem "rack-cors", "~> 2.0"
+
+# Rate limiting / IP blocking against bots, scanners, and brute-force attacks
+gem "rack-attack", "~> 6.7"
+
+# HTTP client for webhook dispatcher
+gem "httparty", "~> 0.22"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
@@ -37,14 +91,11 @@ gem "kamal", require: false
 # Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
 gem "thruster", require: false
 
-# Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-gem "image_processing", "~> 1.2"
-
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
 
-  # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)
+  # Audits gems for known security defects
   gem "bundler-audit", require: false
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
@@ -52,6 +103,9 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  # Environment variables
+  gem "dotenv-rails", "~> 3.1"
 end
 
 group :development do
@@ -64,3 +118,5 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+gem "imagekitio", "~> 4.6"

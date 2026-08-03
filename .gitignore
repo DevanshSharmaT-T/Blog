@@ -33,3 +33,11 @@
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
+/vendor/bundle/ruby
+
+
+/app/assets/builds/*
+!/app/assets/builds/.keep
+
+# Dev-local image uploads (development only; production uses Cloudinary)
+/public/uploads/

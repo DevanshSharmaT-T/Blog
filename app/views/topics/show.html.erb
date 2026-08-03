@@ -1,0 +1,33 @@
+<% content_for :title, @topic.name %>
+
+<div class="page-header">
+  <div>
+    <div class="flex items-center gap-3" style="--topic-color: <%= @topic.color_hex || '#6366f1' %>;">
+      <div class="topic-icon-tile" style="color: var(--topic-color);">
+        <%= topic_icon(@topic.icon_name, class: "w-5 h-5") %>
+      </div>
+      <div>
+        <h1 class="page-title"><%= @topic.name %></h1>
+        <p class="page-subtitle"><%= @topic.description %></p>
+      </div>
+    </div>
+  </div>
+  <%= link_to topics_path, class: "btn btn-secondary" do %>
+    ← All Topics
+  <% end %>
+</div>
+
+<div class="page-content">
+  <% if @blogs.any? %>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+      <% @blogs.each do |blog| %>
+        <%= render "blogs/card", blog: blog %>
+      <% end %>
+    </div>
+    <%= render "shared/pagy_nav", pagy: @pagy if @pagy.pages > 1 %>
+  <% else %>
+    <div class="card py-16 text-center">
+      <p class="text-gray-500">No published posts in this topic yet.</p>
+    </div>
+  <% end %>
+</div>
