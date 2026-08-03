@@ -41,3 +41,4 @@
 
 # Dev-local image uploads (development only; production uses Cloudinary)
 /public/uploads/
+.clude
